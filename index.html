@@ -241,26 +241,6 @@ main { padding: 0; }
 }
 .price.empty { color: var(--ink-4); font-weight: 400; text-align: center; }
 .price .cur { color: var(--ink-3); font-weight: 400; margin-left: 2px; }
-.price .price-old {
-  display: block;
-  font-size: 11px;
-  color: var(--ink-4);
-  text-decoration: line-through;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  margin-bottom: 2px;
-}
-.price .price-old .cur { color: var(--ink-4); }
-.price .price-disc {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink);
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  margin-left: 6px;
-  text-decoration: none;
-  display: inline-block;
-}
 
 .stock {
   font-size: 12px;
@@ -926,12 +906,6 @@ function renderCatalog() {
         ? (w ? Number(it.no_vat.price) / w : Number(it.no_vat.price)) : null;
       const p2raw = it.with_vat && it.with_vat.price != null
         ? (w ? Number(it.with_vat.price) / w : Number(it.with_vat.price)) : null;
-      // Override-ціни: original_price з 1С (для перекреслення), якщо адмін
-      // задав свою ціну в полі override_price_*. Інакше null.
-      const p1orig = it.no_vat && it.no_vat.original_price != null
-        ? (w ? Number(it.no_vat.original_price) / w : Number(it.no_vat.original_price)) : null;
-      const p2orig = it.with_vat && it.with_vat.original_price != null
-        ? (w ? Number(it.with_vat.original_price) / w : Number(it.with_vat.original_price)) : null;
       const itemCur = (it.no_vat && it.no_vat.currency_name) || (it.with_vat && it.with_vat.currency_name) || null;
       const cur = c.unit === '$/Вт' ? '$'
                 : itemCur ? curSym(itemCur)
@@ -939,19 +913,8 @@ function renderCatalog() {
 
       const p1str = fmtPrice(p1raw);
       const p2str = fmtPrice(p2raw);
-      const p1origStr = p1orig != null && p1orig !== p1raw ? fmtPrice(p1orig) : null;
-      const p2origStr = p2orig != null && p2orig !== p2raw ? fmtPrice(p2orig) : null;
-      // Знижка у % від оригіналу. Беремо з raw-цін без ділення на watts (на $/Вт ділиться
-      // одинаково чисельник і знаменник — % виходить той самий).
-      const discPct = (raw, orig) => (raw != null && orig != null && orig > 0 && raw < orig)
-        ? Math.round((1 - raw / orig) * 100) : null;
-      const p1disc = discPct(it.no_vat   && it.no_vat.price,   it.no_vat   && it.no_vat.original_price);
-      const p2disc = discPct(it.with_vat && it.with_vat.price, it.with_vat && it.with_vat.original_price);
-      const oldLine = (s, disc) => s != null
-        ? `<span class="price-old">${esc(s)}<span class="cur"> ${esc(cur)}</span>${disc ? `<span class="price-disc">−${disc}%</span>` : ''}</span>`
-        : '';
-      const p1 = p1str != null ? `${oldLine(p1origStr, p1disc)}<span>${esc(p1str)}</span><span class="cur">${esc(cur)}</span>` : '—';
-      const p2 = p2str != null ? `${oldLine(p2origStr, p2disc)}<span>${esc(p2str)}</span><span class="cur">${esc(cur)}</span>` : '—';
+      const p1 = p1str != null ? `<span>${esc(p1str)}</span><span class="cur">${esc(cur)}</span>` : '—';
+      const p2 = p2str != null ? `<span>${esc(p2str)}</span><span class="cur">${esc(cur)}</span>` : '—';
 
       const stockClass = it.stock === 'в наявності' ? '' : 'wait';
       const dsCell = it.ds_url
