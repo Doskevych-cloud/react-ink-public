@@ -138,7 +138,7 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
 }
 .info-card .v a:not(.tg-icon):not(.copy-btn) { color: var(--ink); }
-.info-card .v a:not(.tg-icon):not(.copy-btn):hover { color: var(--ink-3); }
+.info-card .v a:not(.tg-icon):not(.copy-btn):hover { color: var(--ink-3); text-decoration: underline; text-underline-offset: 2px; }
 .copy-btn {
   display: inline-flex; align-items: center; justify-content: center;
   width: 18px; height: 18px;
@@ -765,21 +765,21 @@ footer {
     <div class="info-card">
       <div class="k">Офіс · Одеса</div>
       <div class="v">
-        <span class="v-text">вул. Велика Арнаутська, 15</span>
+        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Одеса,+вул.+Велика+Арнаутська,+15" target="_blank" rel="noopener">вул. Велика Арнаутська, 15</a>
         <button class="copy-btn" data-copy="Одеса, вул. Велика Арнаутська, 15" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
     <div class="info-card">
       <div class="k">Склад · Одеса</div>
       <div class="v">
-        <span class="v-text">вул. Чигиринська, 21</span>
+        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Одеса,+вул.+Чигиринська,+21" target="_blank" rel="noopener">вул. Чигиринська, 21</a>
         <button class="copy-btn" data-copy="Одеса, вул. Чигиринська, 21" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
     <div class="info-card">
       <div class="k">Склад · Київ</div>
       <div class="v">
-        <span class="v-text">м. Вишневе, вул. Промислова, 10</span>
+        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Вишневе,+вул.+Промислова,+10" target="_blank" rel="noopener">м. Вишневе, вул. Промислова, 10</a>
         <button class="copy-btn" data-copy="м. Вишневе, вул. Промислова, 10" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
@@ -1029,7 +1029,15 @@ document.querySelectorAll('.info-card .v:not(.contact-row)').forEach(v => {
   txt.textContent = raw.slice(0, idx) + ' ';
   const wrap = document.createElement('span');
   wrap.style.whiteSpace = 'nowrap';
-  wrap.appendChild(document.createTextNode(raw.slice(idx + 1) + ' '));
+  if (txt.tagName === 'A') {
+    const tail = document.createElement('a');
+    tail.href = txt.href; tail.target = '_blank'; tail.rel = 'noopener';
+    tail.className = 'v-text';
+    tail.textContent = raw.slice(idx + 1) + ' ';
+    wrap.appendChild(tail);
+  } else {
+    wrap.appendChild(document.createTextNode(raw.slice(idx + 1) + ' '));
+  }
   v.removeChild(btn);
   wrap.appendChild(btn);
   v.appendChild(wrap);
