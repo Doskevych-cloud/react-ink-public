@@ -765,21 +765,21 @@ footer {
     <div class="info-card">
       <div class="k">Офіс · Одеса</div>
       <div class="v">
-        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Одеса,+вул.+Велика+Арнаутська,+15" target="_blank" rel="noopener">вул. Велика Арнаутська, 15</a>
+        <a class="v-text" href="#" target="_blank" rel="noopener">вул. Велика Арнаутська, 15</a>
         <button class="copy-btn" data-copy="Одеса, вул. Велика Арнаутська, 15" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
     <div class="info-card">
       <div class="k">Склад · Одеса</div>
       <div class="v">
-        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Одеса,+вул.+Чигиринська,+21" target="_blank" rel="noopener">вул. Чигиринська, 21</a>
+        <a class="v-text" href="#" target="_blank" rel="noopener">вул. Чигиринська, 21</a>
         <button class="copy-btn" data-copy="Одеса, вул. Чигиринська, 21" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
     <div class="info-card">
       <div class="k">Склад · Київ</div>
       <div class="v">
-        <a class="v-text" href="https://www.google.com/maps/dir/?api=1&destination=Вишневе,+вул.+Промислова,+10" target="_blank" rel="noopener">м. Вишневе, вул. Промислова, 10</a>
+        <a class="v-text" href="#" target="_blank" rel="noopener">м. Вишневе, вул. Промислова, 10</a>
         <button class="copy-btn" data-copy="м. Вишневе, вул. Промислова, 10" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
       </div>
     </div>
@@ -1013,6 +1013,16 @@ async function loadFxSwift() {
     document.getElementById('fxPill').style.display = 'inline-flex';
   } catch (_) { /* silent */ }
 }
+
+// ============================================================
+// ADDRESS → Google Maps directions
+// ============================================================
+document.querySelectorAll('.info-card .v').forEach(v => {
+  const a = v.querySelector('a.v-text');
+  const btn = v.querySelector('.copy-btn[data-copy]');
+  if (!a || !btn) return;
+  a.href = 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(btn.dataset.copy);
+});
 
 // ============================================================
 // COPY-BUTTON з ✓ swap
