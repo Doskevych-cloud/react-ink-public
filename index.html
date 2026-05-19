@@ -805,7 +805,7 @@ footer {
 <div class="print-doc print-only">
   <div class="print-foot">
     <div class="foot-note">
-      <div><b>Умови:</b> ціни вказані у доларах США (USD) без урахування доставки. Остаточна вартість в UAH формується за курсом АТ КБ «Приватбанк» на день оплати.</div>
+      <div><b>Умови:</b> ціни вказані у доларах США (USD) без урахування доставки. Остаточна вартість в UAH формується за курсом НБУ +1% на день оплати.</div>
       <div><b>Термін дії прайса:</b> 3 (три) банківські дні з моменту формування документа.</div>
       <div><b>Форма оплати:</b> безготівковий розрахунок. Податок: загальна система, платник ПДВ.</div>
     </div>
@@ -824,7 +824,7 @@ footer {
 
 <footer>
   <div class="footer-inner">
-    <p>Ціни вказані у доларах США (USD). Остаточна вартість формується за курсом <a href="https://privatbank.ua/peverodi-swift" target="_blank" rel="noopener">SWIFT</a> АТ КБ «Приватбанк» на день оплати.</p>
+    <p>Ціни вказані у доларах США (USD). Остаточна вартість формується за курсом <a href="https://bank.gov.ua/ua/markets/exchangerates" target="_blank" rel="noopener">НБУ</a> +1% на день оплати.</p>
     <div class="copyright">© 2026 React</div>
   </div>
 </footer>
@@ -991,7 +991,7 @@ async function loadAll() {
 }
 
 // ============================================================
-// FX SWIFT — наш worker; показуємо USD/UAH sell + EUR/USD cross-rate.
+// FX НБУ +1% — наш worker; показуємо USD/UAH та EUR/UAH sell.
 // ============================================================
 async function loadFxSwift() {
   try {
