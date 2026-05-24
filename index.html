@@ -993,9 +993,9 @@ async function loadAll() {
 // ============================================================
 // FX НБУ +1% — наш worker; показуємо USD/UAH та EUR/UAH sell.
 // ============================================================
-async function loadFxSwift() {
+async function loadFxNbu() {
   try {
-    const r = await fetch(`${API}/?action=fx_swift`);
+    const r = await fetch(`${API}/?action=fx_nbu`);
     const d = await r.json();
     if (!d.rates) return;
     const usd = d.rates.USD, eur = d.rates.EUR;
@@ -1072,7 +1072,7 @@ document.querySelectorAll('.copy-btn').forEach(btn => {
 // INIT
 // ============================================================
 setHeroDate();
-loadFxSwift();
+loadFxNbu();
 loadAll().catch(err => {
   document.getElementById('catalog').innerHTML = '';
   showNotice('Помилка: ' + err.message, true);
