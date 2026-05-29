@@ -710,7 +710,7 @@ footer {
   <div class="print-info">
     <div class="row-line"><b>Офіс:</b> Одеса, вул. Велика Арнаутська, 15</div>
     <div class="row-line"><b>Склади:</b> Одеса, вул. Чигиринська, 21 · м. Вишневе, вул. Промислова, 10</div>
-    <div class="row-line"><b>Контакти:</b> Катерина +380 67 577 73 40 · Олександра +380 63 325 61 10</div>
+    <div class="row-line"><b>Контакти:</b> Олександра +380 63 325 61 10</div>
     <div class="row-line"><b>Курс:</b> USD/UAH <span id="printFxUsd">—</span> · EUR/UAH <span id="printFxEur">—</span></div>
   </div>
 
@@ -743,18 +743,6 @@ footer {
 <section class="hero">
   <div class="hero-date" id="heroDate">Оновлено</div>
   <div class="contacts-row">
-    <div class="info-card">
-      <div class="contact-card-inner">
-        <span class="avatar"><img src="assets/kateryna.jpg" alt="Катерина"></span>
-        <div class="contact-body">
-          <div class="k">Катерина</div>
-          <div class="v contact-row">
-            <a href="tel:+380675777340">+380 67 577 73 40</a>
-            <a class="tg-icon" href="https://t.me/kateryna_react" target="_blank" aria-label="Telegram"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg></a>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="info-card">
       <div class="contact-card-inner">
         <span class="avatar"><img src="assets/oleksandra.jpg" alt="Олександра"></span>
@@ -1129,13 +1117,10 @@ function buildPdfDocDefinition() {
     {
       columns: [
         { stack: [
-          { text: 'КАТЕРИНА', style: 'metaLabel' },
-          { text: '+380 67 577 73 40', style: 'metaValue' }
-        ]},
-        { stack: [
           { text: 'ОЛЕКСАНДРА', style: 'metaLabel' },
           { text: '+380 63 325 61 10', style: 'metaValue' }
         ]},
+        { text: '' },
         { text: '' },
       ],
       margin: [0, 0, 0, 10],
