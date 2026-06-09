@@ -672,6 +672,20 @@ const OBLASTS = ['Вінницька','Волинська','Дніпропетр
   document.addEventListener('mousedown', (e) => { if (!box.contains(e.target)) closeList(); });
 })();
 
+// ── Телефон: тільки цифри, рівно 9 (після +380), формат XX XXX XX XX ──
+(function initPhone() {
+  const inp = document.getElementById('f_phone');
+  inp.addEventListener('input', () => {
+    const d = inp.value.replace(/\D/g, '').slice(0, 9);
+    let out = d;
+    if (d.length > 7)      out = `${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5,7)} ${d.slice(7)}`;
+    else if (d.length > 5) out = `${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5)}`;
+    else if (d.length > 2) out = `${d.slice(0,2)} ${d.slice(2)}`;
+    inp.value = out;
+  });
+  inp.addEventListener('keypress', (e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+})();
+
 function fieldError(name, msg) {
   const wrap = form.querySelector(`[data-field="${name}"]`);
   const err = form.querySelector(`[data-err="${name}"]`);
@@ -703,7 +717,7 @@ form.addEventListener('submit', async (e) => {
   if (!person) fail('person', 'Вкажіть контактну особу');
   const digits = phoneRaw.replace(/\D/g, '');
   if (!phoneRaw) fail('phone', 'Вкажіть телефон');
-  else if (digits.length < 9) fail('phone', 'Перевірте номер телефону');
+  else if (digits.length !== 9) fail('phone', 'Номер має містити 9 цифр (після +380)');
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('email', 'Невірний формат e-mail');
   if (edrpou && !/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
   if (!consent) { document.getElementById('consentWrap').classList.add('invalid'); if (!firstBad) firstBad = 'consent'; ok = false; }
@@ -720,7 +734,7 @@ form.addEventListener('submit', async (e) => {
     company,
     code: edrpou,
     contact: person,
-    phone: '+380' + phoneRaw,
+    phone: '+380' + phoneRaw.replace(/\D/g, ''),
     email,
     city: v('region'),
     field: form.querySelector('[name="profile"]').value,
