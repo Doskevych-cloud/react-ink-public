@@ -394,7 +394,7 @@ gtag('config', 'G-8P7TF4SV17');
             <div class="form-banner" id="formBanner" role="alert" aria-live="assertive"></div>
 
             <div class="field">
-              <label>Тип контрагента</label>
+              <label>Тип контрагента <span class="req">*</span></label>
               <div class="seg" role="group" aria-label="Тип контрагента" id="entitySeg">
                 <button type="button" data-val="ТОВ" aria-pressed="true">ТОВ</button>
                 <button type="button" data-val="ФОП" aria-pressed="false">ФОП</button>
@@ -410,8 +410,8 @@ gtag('config', 'G-8P7TF4SV17');
                 <div class="err" data-err="company"></div>
               </div>
               <div class="field" data-field="edrpou">
-                <label for="f_edrpou">ЄДРПОУ / ІПН <span class="opt">— необов'язково</span></label>
-                <input id="f_edrpou" class="control mono" name="edrpou" inputmode="numeric" placeholder="00000000" />
+                <label for="f_edrpou">ЄДРПОУ / ІПН <span class="req">*</span></label>
+                <input id="f_edrpou" class="control mono" name="edrpou" inputmode="numeric" placeholder="00000000" required aria-required="true" />
                 <div class="err" data-err="edrpou"></div>
               </div>
             </div>
@@ -439,20 +439,21 @@ gtag('config', 'G-8P7TF4SV17');
                 <div class="err" data-err="email"></div>
               </div>
               <div class="field" data-field="region">
-                <label for="f_region">Область</label>
+                <label for="f_region">Область <span class="req">*</span></label>
                 <div class="combo" id="regionCombo">
                   <div class="combo__field">
-                    <input id="f_region" class="control" name="region" placeholder="Почніть вводити…" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" />
+                    <input id="f_region" class="control" name="region" placeholder="Почніть вводити…" autocomplete="off" required aria-required="true" role="combobox" aria-expanded="false" aria-autocomplete="list" />
                     <span class="combo__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
                   </div>
                   <ul class="combo__list" role="listbox" hidden></ul>
                 </div>
+                <div class="err" data-err="region"></div>
               </div>
             </div>
 
             <div class="form-row">
               <div class="field">
-                <label for="f_profile">Профіль діяльності</label>
+                <label for="f_profile">Профіль діяльності <span class="req">*</span></label>
                 <select id="f_profile" class="control" name="profile">
                   <option>Інсталятор</option>
                   <option>Магазин / Роздріб</option>
@@ -461,9 +462,9 @@ gtag('config', 'G-8P7TF4SV17');
                   <option>Інше</option>
                 </select>
               </div>
-              <div class="field">
-                <label for="f_volume">Очікуваний обсяг / міс</label>
-                <select id="f_volume" class="control" name="volume">
+              <div class="field" data-field="volume">
+                <label for="f_volume">Очікуваний обсяг / міс <span class="req">*</span></label>
+                <select id="f_volume" class="control" name="volume" required aria-required="true">
                   <option value="">Оберіть діапазон</option>
                   <option>до $5 000</option>
                   <option>$5 000 – $20 000</option>
@@ -471,12 +472,14 @@ gtag('config', 'G-8P7TF4SV17');
                   <option>$50 000 – $200 000</option>
                   <option>понад $200 000</option>
                 </select>
+                <div class="err" data-err="volume"></div>
               </div>
             </div>
 
-            <div class="field">
-              <label for="f_note">Коментар <span class="opt">— необов'язково</span></label>
-              <textarea id="f_note" class="control" name="note" placeholder="Які категорії обладнання вас цікавлять?"></textarea>
+            <div class="field" data-field="note">
+              <label for="f_note">Коментар <span class="req">*</span></label>
+              <textarea id="f_note" class="control" name="note" placeholder="Які категорії обладнання вас цікавлять?" required aria-required="true"></textarea>
+              <div class="err" data-err="note"></div>
             </div>
 
             <!-- honeypot -->
@@ -707,19 +710,25 @@ form.addEventListener('submit', async (e) => {
 
   const v = (n) => form.querySelector(`[name="${n}"]`).value.trim();
   const company = v('company'), edrpou = v('edrpou'), person = v('person'),
-        phoneRaw = v('phone'), email = v('email');
+        phoneRaw = v('phone'), email = v('email'),
+        region = v('region'), volume = v('volume'), note = v('note');
   const consent = document.getElementById('consent').checked;
 
   let ok = true, firstBad = null;
   const fail = (name, msg) => { fieldError(name, msg); if (!firstBad) firstBad = name; ok = false; };
 
+  // Усі поля обовʼязкові, крім e-mail.
   if (!company) fail('company', 'Вкажіть назву компанії');
+  if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ/ІПН');
+  else if (!/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
   if (!person) fail('person', 'Вкажіть контактну особу');
   const digits = phoneRaw.replace(/\D/g, '');
   if (!phoneRaw) fail('phone', 'Вкажіть телефон');
   else if (digits.length !== 9) fail('phone', 'Номер має містити 9 цифр (після +380)');
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('email', 'Невірний формат e-mail');
-  if (edrpou && !/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
+  if (!region) fail('region', 'Оберіть область');
+  if (!volume) fail('volume', 'Оберіть обсяг');
+  if (!note) fail('note', 'Додайте коментар');
   if (!consent) { document.getElementById('consentWrap').classList.add('invalid'); if (!firstBad) firstBad = 'consent'; ok = false; }
 
   if (!ok) {
