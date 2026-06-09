@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper:#FBFAF6; --paper-2:#F4F1EA; --ink:#17191D; --ink-2:#5C6068; --ink-3:#8B8F97;
+    --line:#E5E0D6; --line-2:#D8D2C5; --accent:#E2872E; --accent-deep:#B5660F; --accent-wash:#FBF0E1;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { width:1200px; height:630px; overflow:hidden; }
+  body {
+    background: var(--paper);
+    font-family:'Schibsted Grotesk', system-ui, sans-serif;
+    color: var(--ink);
+    padding: 70px 80px;
+    position: relative;
+    display:flex; flex-direction:column; justify-content:space-between;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* subtle amber glow corner */
+  body::after {
+    content:''; position:absolute; right:-160px; top:-160px; width:520px; height:520px;
+    background: radial-gradient(circle, var(--accent-wash) 0%, rgba(251,240,225,0) 70%);
+  }
+  .top { display:flex; align-items:center; gap:18px; position:relative; z-index:1; }
+  .top img { height:42px; display:block; }
+  .tag {
+    font-family:'Spline Sans Mono', monospace; font-size:16px; letter-spacing:.14em; text-transform:uppercase;
+    color: var(--ink-3); padding-left:20px; border-left:1px solid var(--line-2);
+  }
+  .mid { position:relative; z-index:1; }
+  .eyebrow {
+    display:inline-flex; align-items:center; gap:14px;
+    font-size:19px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-deep);
+    margin-bottom:26px;
+  }
+  .dot { width:11px; height:11px; border-radius:50%; background:var(--accent); }
+  h1 { font-size:92px; line-height:.98; letter-spacing:-.035em; font-weight:700; }
+  h1 .muted { color: var(--ink-3); }
+  .sub { font-size:28px; color:var(--ink-2); margin-top:30px; max-width:30ch; line-height:1.45; font-weight:400; }
+  .bottom { display:flex; align-items:center; gap:14px; position:relative; z-index:1; }
+  .pill {
+    display:inline-flex; align-items:center; gap:12px; background:var(--ink); color:var(--paper);
+    border-radius:999px; padding:16px 30px; font-size:21px; font-weight:600;
+  }
+  .pill svg { width:24px; height:6px; }
+  .chip {
+    border:1px solid var(--line-2); border-radius:999px; padding:14px 24px; font-size:19px; color:var(--ink-2);
+    font-weight:500;
+  }
+</style>
+</head>
+<body>
+  <div class="top">
+    <img src="assets/react-logo.png" alt="React" />
+    <span class="tag">B2B портал</span>
+  </div>
+
+  <div class="mid">
+    <span class="eyebrow"><span class="dot"></span>Верифікація партнера</span>
+    <h1>Оптовий прайс<br />для партнерів <span class="muted">React</span></h1>
+    <p class="sub">Гуртові ціни в USD, наявність зі складів та персональний менеджер.</p>
+  </div>
+
+  <div class="bottom">
+    <span class="pill">Подати заявку <svg viewBox="0 0 170 44" fill="currentColor"><path d="M0 0 L170 0 L126 44 L114 32 L128 18 L0 17 Z"/></svg></span>
+    <span class="chip">Склади · Одеса · Київ</span>
+    <span class="chip">Курс НБУ +1%</span>
+  </div>
+</body>
+</html>
