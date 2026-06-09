@@ -205,7 +205,7 @@ gtag('config', 'G-8P7TF4SV17');
   .combo__tick { color: var(--accent-deep); display: flex; }
   .combo__empty { padding: 12px; font-size: 14px; color: var(--ink-3); text-align: center; }
 
-  .seg { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; background: var(--paper); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--paper); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; }
   .seg button {
     border: 0; background: transparent; border-radius: 7px; padding: 9px 8px; font-size: 14px; font-weight: 600;
     color: var(--ink-2); transition: color .2s, background .2s, box-shadow .2s; letter-spacing: -.01em;
@@ -309,7 +309,7 @@ gtag('config', 'G-8P7TF4SV17');
     .verify .wrap { padding-top: 56px !important; padding-bottom: 64px !important; }
     .form-row { grid-template-columns: 1fr; }
     .card { padding: 24px; }
-    .seg { grid-template-columns: repeat(2, 1fr); }
+    .seg { grid-template-columns: repeat(3, 1fr); }
     .verify__aside h2 br { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -359,7 +359,7 @@ gtag('config', 'G-8P7TF4SV17');
 
         <aside class="verify__aside">
           <span class="kicker">Як це працює</span>
-          <h2>Три кроки до<br />співпраці</h2>
+          <h2>Три кроки до <br />співпраці</h2>
           <ol class="vsteps">
             <li class="vstep">
               <span class="vstep__n mono">01</span>
@@ -399,11 +399,10 @@ gtag('config', 'G-8P7TF4SV17');
                 <button type="button" data-val="ТОВ" aria-pressed="true">ТОВ</button>
                 <button type="button" data-val="ФОП" aria-pressed="false">ФОП</button>
                 <button type="button" data-val="Фізособа" aria-pressed="false">Фізособа</button>
-                <button type="button" data-val="Інше" aria-pressed="false">Інше</button>
               </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-row" id="rowIdentity">
               <div class="field" data-field="company">
                 <label for="f_company">Назва компанії <span class="req">*</span></label>
                 <input id="f_company" class="control" name="company" placeholder="ТОВ «Сонячний дім»" required aria-required="true" />
@@ -633,14 +632,32 @@ const banner = document.getElementById('formBanner');
 const submitBtn = document.getElementById('submitBtn');
 const btnLabel = submitBtn.querySelector('.btn-label');
 
-// segmented control
+// segmented control (тип контрагента)
 let entity = 'ТОВ';
+const COMPANY_PH = { 'ТОВ': 'ТОВ «Сонячний дім»', 'ФОП': 'ФОП «Солар Степан Дмитрович»' };
+function applyEntity() {
+  const isFiz = entity === 'Фізособа';
+  const row = document.getElementById('rowIdentity');
+  if (row) row.style.display = isFiz ? 'none' : '';
+  const company = document.getElementById('f_company'), edrpou = document.getElementById('f_edrpou');
+  if (isFiz) {
+    // Фізособа — без назви компанії та ЄДРПОУ: ховаємо й чистимо ці поля.
+    if (company) company.value = '';
+    if (edrpou) edrpou.value = '';
+    document.querySelector('[data-field="company"]').classList.remove('invalid');
+    document.querySelector('[data-field="edrpou"]').classList.remove('invalid');
+  } else if (company) {
+    company.placeholder = COMPANY_PH[entity] || COMPANY_PH['ТОВ'];
+  }
+}
 document.getElementById('entitySeg').addEventListener('click', e => {
   const b = e.target.closest('button[data-val]');
   if (!b) return;
   entity = b.dataset.val;
   document.querySelectorAll('#entitySeg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  applyEntity();
 });
+applyEntity();
 
 // ── Область — combobox з автодоповненням ──
 const OBLASTS = ['Вінницька','Волинська','Дніпропетровська','Донецька','Житомирська','Закарпатська','Запорізька','Івано-Франківська','Київська','м. Київ','Кіровоградська','Луганська','Львівська','Миколаївська','Одеська','Полтавська','Рівненська','Сумська','Тернопільська','Харківська','Херсонська','Хмельницька','Черкаська','Чернівецька','Чернігівська'];
@@ -717,10 +734,12 @@ form.addEventListener('submit', async (e) => {
   let ok = true, firstBad = null;
   const fail = (name, msg) => { fieldError(name, msg); if (!firstBad) firstBad = name; ok = false; };
 
-  // Усі поля обовʼязкові, крім e-mail.
-  if (!company) fail('company', 'Вкажіть назву компанії');
-  if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ/ІПН');
-  else if (!/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
+  // Усі поля обовʼязкові, крім e-mail. Для Фізособи назва компанії та ЄДРПОУ приховані.
+  if (entity !== 'Фізособа') {
+    if (!company) fail('company', 'Вкажіть назву компанії');
+    if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ/ІПН');
+    else if (!/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
+  }
   if (!person) fail('person', 'Вкажіть контактну особу');
   const digits = phoneRaw.replace(/\D/g, '');
   if (!phoneRaw) fail('phone', 'Вкажіть телефон');
@@ -803,6 +822,7 @@ document.getElementById('resetForm').addEventListener('click', () => {
   form.reset();
   entity = 'ТОВ';
   document.querySelectorAll('#entitySeg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.val === 'ТОВ')));
+  applyEntity();
   clearErrors();
   successView.classList.remove('show');
   form.style.display = '';
