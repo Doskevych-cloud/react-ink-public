@@ -35,15 +35,15 @@
   .btn--ghost:hover { background: var(--paper-2); border-color: var(--ink-3); }
   .btn--solid { background: var(--ink); color: var(--paper); }
   .btn--solid:hover { background: #000; transform: translateY(-1px); box-shadow: 0 12px 26px -14px rgba(23,25,29,.5); }
-  .btn .arr { display: inline-flex; transition: transform .3s var(--ease); }
-  .btn:hover .arr { transform: translateX(4px); }
+  .btn .arr { display: inline-flex; transition: transform .3s var(--ease); transform: translateY(2px); }
+  .btn:hover .arr { transform: translate(4px, 2px); }
 
   /* bar */
   .cab__bar { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 88%, transparent);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
   .cab__bar-in { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 16px; }
   .brand { display: flex; align-items: center; gap: 14px; }
-  .brand img { height: 26px; width: auto; display: block; }
+  .brand img { height: 32px; width: auto; display: block; }
   .brand__tag { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3);
     padding-left: 14px; border-left: 1px solid var(--line-2); font-weight: 500; }
   .cab__user { display: flex; align-items: center; gap: 22px; }
@@ -123,7 +123,7 @@
     </div>
     <h1 id="denyTitle">Доступ не знайдено</h1>
     <p id="denyText">Це посилання недійсне або доступ відкликано. Зверніться до вашого менеджера React або подайте заявку на верифікацію.</p>
-    <a class="btn btn--solid" href="/verify">Подати заявку <span class="arr"><svg width="19" height="19" viewBox="0 0 28 22" fill="currentColor"><path d="M1 5H25L19.4 19L16 9H1V5Z"/></svg></span></a>
+    <a class="btn btn--solid" href="/verify">Подати заявку <span class="arr"><svg width="24" height="6" viewBox="0 0 170 44" fill="currentColor"><path d="M0 0 L170 0 L126 44 L114 32 L128 18 L0 17 Z"/></svg></span></a>
   </div>
 </div>
 
