@@ -189,7 +189,7 @@ gtag('config', 'G-8P7TF4SV17');
     font-family: 'Spline Sans Mono', monospace; padding-right: 10px; border-right: 1px solid var(--line); height: 22px;
     display: flex; align-items: center;
   }
-  .input-prefix .control { padding-left: 72px; }
+  .input-prefix .control { padding-left: 60px; }
 
   /* combobox (область) */
   .combo { position: relative; }
@@ -411,7 +411,7 @@ gtag('config', 'G-8P7TF4SV17');
                 <div class="err" data-err="company"></div>
               </div>
               <div class="field" data-field="edrpou">
-                <label for="f_edrpou">ЄДРПОУ / ІПН <span class="req">*</span></label>
+                <label for="f_edrpou"><span id="edrpouName">ЄДРПОУ</span> <span class="req">*</span></label>
                 <input id="f_edrpou" class="control mono" name="edrpou" inputmode="numeric" placeholder="00000000" required aria-required="true" />
                 <div class="err" data-err="edrpou"></div>
               </div>
@@ -426,8 +426,8 @@ gtag('config', 'G-8P7TF4SV17');
               <div class="field" data-field="phone">
                 <label for="f_phone">Телефон <span class="req">*</span></label>
                 <div class="input-prefix">
-                  <span class="pfx">+380</span>
-                  <input id="f_phone" class="control mono" name="phone" inputmode="tel" placeholder="00 000 00 00" required aria-required="true" />
+                  <span class="pfx">+38</span>
+                  <input id="f_phone" class="control mono" name="phone" inputmode="tel" placeholder="0XX XXX XX XX" required aria-required="true" />
                 </div>
                 <div class="err" data-err="phone"></div>
               </div>
@@ -650,6 +650,11 @@ function applyEntity() {
     document.querySelector('[data-field="edrpou"]').classList.remove('invalid');
   } else if (company) {
     company.placeholder = COMPANY_PH[entity] || COMPANY_PH['ТОВ'];
+    // ТОВ → ЄДРПОУ (8 цифр), ФОП → ІПН (10 цифр).
+    const isFop = entity === 'ФОП';
+    const nameEl = document.getElementById('edrpouName');
+    if (nameEl) nameEl.textContent = isFop ? 'ІПН' : 'ЄДРПОУ';
+    if (edrpou) edrpou.placeholder = isFop ? '0000000000' : '00000000';
   }
 }
 document.getElementById('entitySeg').addEventListener('click', e => {
@@ -694,17 +699,24 @@ const OBLASTS = ['Вінницька','Волинська','Дніпропетр
   document.addEventListener('mousedown', (e) => { if (!box.contains(e.target)) closeList(); });
 })();
 
-// ── Телефон: тільки цифри, рівно 9 (після +380), формат XX XXX XX XX ──
+// ── Телефон: тільки цифри, рівно 10 (з 0, після +38), формат 0XX XXX XX XX ──
 (function initPhone() {
   const inp = document.getElementById('f_phone');
   inp.addEventListener('input', () => {
-    const d = inp.value.replace(/\D/g, '').slice(0, 9);
+    const d = inp.value.replace(/\D/g, '').slice(0, 10);
     let out = d;
-    if (d.length > 7)      out = `${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5,7)} ${d.slice(7)}`;
-    else if (d.length > 5) out = `${d.slice(0,2)} ${d.slice(2,5)} ${d.slice(5)}`;
-    else if (d.length > 2) out = `${d.slice(0,2)} ${d.slice(2)}`;
+    if (d.length > 8)      out = `${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6,8)} ${d.slice(8)}`;
+    else if (d.length > 6) out = `${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6)}`;
+    else if (d.length > 3) out = `${d.slice(0,3)} ${d.slice(3)}`;
     inp.value = out;
   });
+  inp.addEventListener('keypress', (e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
+})();
+
+// ── ЄДРПОУ/ІПН: тільки цифри, максимум 10 ──
+(function initEdrpou() {
+  const inp = document.getElementById('f_edrpou');
+  inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 10); });
   inp.addEventListener('keypress', (e) => { if (!/[0-9]/.test(e.key)) e.preventDefault(); });
 })();
 
@@ -739,13 +751,19 @@ form.addEventListener('submit', async (e) => {
   // Усі поля обовʼязкові, крім e-mail. Для Фізособи назва компанії та ЄДРПОУ приховані.
   if (entity !== 'Фізособа') {
     if (!company) fail('company', 'Вкажіть назву компанії');
-    if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ/ІПН');
-    else if (!/^\d{8,10}$/.test(edrpou.replace(/\D/g, ''))) fail('edrpou', 'ЄДРПОУ/ІПН — 8–10 цифр');
+    const codeDigits = edrpou.replace(/\D/g, '');
+    if (entity === 'ФОП') {
+      if (!edrpou) fail('edrpou', 'Вкажіть ІПН');
+      else if (codeDigits.length !== 10) fail('edrpou', 'ІПН — 10 цифр');
+    } else {
+      if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ');
+      else if (codeDigits.length !== 8) fail('edrpou', 'ЄДРПОУ — 8 цифр');
+    }
   }
   if (!person) fail('person', 'Вкажіть контактну особу');
   const digits = phoneRaw.replace(/\D/g, '');
   if (!phoneRaw) fail('phone', 'Вкажіть телефон');
-  else if (digits.length !== 9) fail('phone', 'Номер має містити 9 цифр (після +380)');
+  else if (digits.length !== 10) fail('phone', 'Номер має містити 10 цифр (з 0, після +38)');
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('email', 'Невірний формат e-mail');
   if (!region) fail('region', 'Оберіть область');
   if (!volume) fail('volume', 'Оберіть обсяг');
@@ -764,7 +782,7 @@ form.addEventListener('submit', async (e) => {
     company,
     code: edrpou,
     contact: person,
-    phone: '+380' + phoneRaw.replace(/\D/g, ''),
+    phone: '+38' + phoneRaw.replace(/\D/g, ''),
     email,
     city: v('region'),
     field: form.querySelector('[name="profile"]').value,
