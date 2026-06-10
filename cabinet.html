@@ -212,9 +212,9 @@ main { padding: 0; }
   margin: 0 auto;
   padding: 14px 28px 12px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px 140px 130px 110px;
+  grid-template-columns: minmax(0, 1fr) 104px 104px 104px 64px 64px 76px 86px;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 .row-head div {
   font-size: 10.5px;
@@ -239,9 +239,9 @@ main { padding: 0; }
 
 .row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 140px 140px 130px 110px;
+  grid-template-columns: minmax(0, 1fr) 104px 104px 104px 64px 64px 76px 86px;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
   padding: 16px 4px;
   transition: background .12s ease;
 }
@@ -288,6 +288,21 @@ main { padding: 0; }
 .stock .led { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
 .stock.wait { color: var(--accent-deep); }
 .stock.wait .led { background: var(--accent); }
+
+.wh {
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.wh.zero { color: var(--ink-4); }
+.mobile-wh {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-3);
+  letter-spacing: 0.03em;
+}
 
 .ds-link {
   font-family: var(--mono);
@@ -375,7 +390,7 @@ footer {
   .cat-head h2 { font-size: 17px; }
 
   .row-head { padding: 12px 32px; grid-template-columns: 1fr 96px; gap: 16px; }
-  .row-head .head-p1, .row-head .head-p2, .row-head .head-ds { display: none; }
+  .row-head .head-p1, .row-head .head-p2, .row-head .head-ds, .row-head .head-wh { display: none; }
   .row-head .head-stock { display: none; }
   .row-head::after {
     content: 'Ціна';
@@ -450,6 +465,12 @@ footer {
     text-align: right;
   }
 
+  .row > .mobile-wh {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    margin-top: 6px;
+    display: block;
+  }
   .row > .mobile-foot {
     grid-column: 1 / -1;
     grid-row: 2;
@@ -851,6 +872,9 @@ footer {
     <div class="num-col head-p1">Ціна без ПДВ</div>
     <div class="num-col head-p2">Ціна з ПДВ</div>
     <div class="head-stock">Наявність</div>
+    <div class="num-col head-wh">Одеса</div>
+    <div class="num-col head-wh">Київ</div>
+    <div class="num-col head-wh">Київ БН</div>
     <div class="head-ds">Даташит</div>
   </div>
 </div>
@@ -1006,6 +1030,9 @@ function renderCatalog() {
         <div class="price desktop-only${p1str == null ? ' empty' : ''}">${p1}</div>
         <div class="price desktop-only${p2str == null ? ' empty' : ''}">${p2}</div>
         <div class="desktop-only"><span class="stock ${stockClass}"><span class="led"></span>${esc(it.stock)}</span></div>
+        <div class="desktop-only wh${it.odessa ? '' : ' zero'}">${it.odessa || '—'}</div>
+        <div class="desktop-only wh${it.kyiv ? '' : ' zero'}">${it.kyiv || '—'}</div>
+        <div class="desktop-only wh${it.kyiv_bn ? '' : ' zero'}">${it.kyiv_bn || '—'}</div>
         <div class="desktop-only">${dsCell}</div>
 
         <div class="mobile-prices mobile-meta">
@@ -1017,6 +1044,7 @@ function renderCatalog() {
           <span class="stock ${stockClass}"><span class="led"></span>${esc(it.stock)}</span>
           ${it.ds_url ? `<a class="ds-link" href="${esc(it.ds_url)}" target="_blank" rel="noopener">${dsIcon}PDF</a>` : ''}
         </div>
+        <div class="mobile-wh mobile-meta">Одеса ${it.odessa || '—'} · Київ ${it.kyiv || '—'} · Київ БН ${it.kyiv_bn || '—'}</div>
       `;
       sec.appendChild(row);
     });
@@ -1049,6 +1077,9 @@ async function loadAll() {
           ds_url: it.datasheet || null,
           no_vat:   it.no_vat   != null ? { price: Number(it.no_vat),   currency_name: curName } : null,
           with_vat: it.with_vat != null ? { price: Number(it.with_vat), currency_name: curName } : null,
+          odessa: Number(it.odessa) || 0,
+          kyiv: Number(it.kyiv) || 0,
+          kyiv_bn: Number(it.kyiv_bn) || 0,
         };
       }),
   })).filter(c => c.items.length > 0);
