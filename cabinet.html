@@ -11,7 +11,7 @@
 <style>
   :root {
     --paper: #FBFAF6; --paper-2: #F4F1EA; --paper-3: #EFEBE2;
-    --ink: #17191D; --ink-2: #5C6068; --ink-3: #8B8F97;
+    --ink: #17191D; --ink-2: #5C6068; --ink-3: #8B8F97; --ink-4: #B8BBC1;
     --line: #E5E0D6; --line-2: #D8D2C5;
     --accent: #E2872E; --accent-deep: #B5660F; --accent-wash: #FBF0E1;
     --ok: #2F7D52; --danger: #C2452F;
@@ -19,6 +19,7 @@
     --shadow-sm: 0 1px 2px rgba(23,25,29,0.04);
     --shadow-md: 0 18px 50px -28px rgba(23,25,29,0.30);
     --maxw: 1180px; --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --mono: 'Spline Sans Mono', ui-monospace, monospace;
     font-family: 'Schibsted Grotesk', system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
@@ -26,7 +27,7 @@
   body { background: var(--paper); color: var(--ink); font-family: 'Schibsted Grotesk', system-ui, sans-serif; -webkit-font-smoothing: antialiased; line-height: 1.5; }
   a { color: inherit; text-decoration: none; }
   button { font-family: inherit; cursor: pointer; }
-  .mono { font-family: 'Spline Sans Mono', ui-monospace, monospace; }
+  .mono { font-family: var(--mono); }
   .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 32px; }
 
   .btn { display: inline-flex; align-items: center; gap: 9px; font-size: 14.5px; font-weight: 600; letter-spacing: -.01em;
@@ -35,10 +36,12 @@
   .btn--ghost:hover { background: var(--paper-2); border-color: var(--ink-3); }
   .btn--solid { background: var(--ink); color: var(--paper); }
   .btn--solid:hover { background: #000; transform: translateY(-1px); box-shadow: 0 12px 26px -14px rgba(23,25,29,.5); }
+  .btn:disabled { opacity: .55; cursor: wait; transform: none !important; box-shadow: none !important; }
   .btn .arr { display: inline-flex; transition: transform .3s var(--ease); transform: translateY(2px); }
   .btn:hover .arr { transform: translate(4px, 2px); }
+  .btn--sm { padding: 8px 16px; font-size: 13px; }
 
-  /* bar */
+  /* ── bar ── */
   .cab__bar { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 88%, transparent);
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
   .cab__bar-in { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 16px; }
@@ -52,59 +55,90 @@
   .cab__meta { font-size: 12.5px; color: var(--ink-3); }
   .cab__meta .disc { color: var(--accent-deep); font-weight: 600; }
 
-  .cab__body { padding: 48px 32px 80px; }
-  .cab__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+  /* ── head ── */
+  .cab__body { padding: 42px 32px 80px; }
+  .cab__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 26px; flex-wrap: wrap; }
   .kicker { font-size: 12.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
   .cab__title { font-size: clamp(28px, 3.4vw, 40px); letter-spacing: -.03em; font-weight: 700; margin: 14px 0 0; }
   .cab__sub { font-size: 14.5px; color: var(--ink-2); margin: 8px 0 0; }
-  .cab__legend { display: flex; gap: 18px; font-size: 13px; color: var(--ink-2); }
-  .cab__legend span { display: inline-flex; align-items: center; gap: 7px; }
-  .dotk { width: 8px; height: 8px; border-radius: 50%; }
-  .dotk.ok { background: var(--ok); } .dotk.low { background: var(--accent); } .dotk.out { background: var(--ink-3); }
+  .hero-date { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .12em; margin-top: 14px; font-weight: 500; }
+  .cab__tools { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; }
+  .fx-pill { display: none; align-items: baseline; gap: 18px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: .02em; }
+  .fx-pill span { display: inline-flex; gap: 6px; }
+  .fx-pill b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .pdf-btn svg { width: 14px; height: 14px; }
 
-  .ptable { border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: #fff; box-shadow: var(--shadow-sm); }
-  .ptable__h, .ptable__row { display: grid; grid-template-columns: 2.4fr 1fr 1fr .8fr .8fr; align-items: center; gap: 16px; padding: 14px 24px; }
-  .ptable__h { background: var(--paper-2); border-bottom: 1px solid var(--line); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
-  .ptable__h .r, .ptable__row .r { text-align: right; justify-self: end; }
-  .ptable__cat { padding: 12px 24px; background: var(--paper); border-bottom: 1px solid var(--line); border-top: 1px solid var(--line);
-    font-size: 12px; letter-spacing: .08em; text-transform: uppercase; font-weight: 600; color: var(--ink-2); }
-  .ptable__cat:first-child { border-top: 0; }
-  .ptable__row { border-bottom: 1px solid var(--line); transition: background .15s; }
-  .ptable__row:last-child { border-bottom: 0; }
-  .ptable__row:hover { background: var(--paper-2); }
-  .pname { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
-  .pspec { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
-  .pprice { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-  .pprice.muted { color: var(--ink-4, #b4b4b4); font-weight: 500; }
-  .pprice .pdash { color: var(--ink-3); font-weight: 500; }
-  .stock { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .stock--ok { color: var(--ok); } .stock--low { color: var(--accent-deep); } .stock--out { color: var(--ink-3); font-weight: 500; }
+  /* ── catalog card (структура як на react.ink, стилі кабінету) ── */
+  .pricecard { border: 1px solid var(--line); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-sm); overflow: clip; }
+  .row-head { position: sticky; top: 76px; z-index: 30; background: var(--paper-2); border-bottom: 1px solid var(--line);
+    padding: 13px 24px 11px; display: grid; grid-template-columns: minmax(0,1fr) 130px 130px 124px 96px; align-items: center; gap: 22px; }
+  .row-head div { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
+  .row-head .num-col { text-align: center; }
+
+  .category { border-top: 1px solid var(--line); }
+  .category:first-child { border-top: none; }
+  .cat-head { padding: 18px 24px 10px; background: var(--paper); border-bottom: 1px solid var(--line); }
+  .cat-head h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+
+  .row { display: grid; grid-template-columns: minmax(0,1fr) 130px 130px 124px 96px; align-items: center; gap: 22px;
+    padding: 14px 24px; border-bottom: 1px solid var(--line); transition: background .15s; }
+  .row:last-child { border-bottom: 0; }
+  .row:hover { background: var(--paper-2); }
+  .prod-name { font-size: 14.5px; font-weight: 600; color: var(--ink); min-width: 0; letter-spacing: -.01em; }
+  .prod-sub { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 3px; font-weight: 400; }
+  .price { font-family: var(--mono); font-size: 14.5px; font-weight: 500; text-align: center; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .price.empty { color: var(--ink-4); font-weight: 400; }
+  .price .cur { color: var(--ink-3); font-weight: 400; margin-left: 2px; }
+  .stock { font-size: 12.5px; display: inline-flex; align-items: center; gap: 8px; padding: 4px 0; font-weight: 500; white-space: nowrap; color: var(--ink); }
+  .stock .led { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
+  .stock.wait { color: var(--accent-deep); }
+  .stock.wait .led { background: var(--accent); }
+  .ds-link { font-family: var(--mono); font-size: 11px; color: var(--ink-3); display: inline-flex; align-items: center; gap: 5px;
+    width: fit-content; font-weight: 500; letter-spacing: .02em; text-transform: uppercase; transition: color .15s; }
+  .ds-link:hover { color: var(--ink); }
+  .ds-link svg { width: 11px; height: 11px; }
+  .ds-link.none { color: var(--ink-4); cursor: default; }
+
+  .loader { padding: 40px 24px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .12em; text-align: center; }
+  .notice { display: none; margin: 0 0 16px; padding: 12px 16px; border: 1px solid rgba(194,69,47,.25); border-radius: var(--r-sm);
+    background: rgba(194,69,47,.06); font-size: 13.5px; color: var(--danger); white-space: pre-wrap; }
+  .notice.show { display: block; }
+
   .cab__note { font-size: 13px; color: var(--ink-3); margin: 20px 2px 0; line-height: 1.5; }
   .cab__note b { color: var(--accent-deep); }
 
-  /* gate / states */
+  /* ── gate / states ── */
   .gate { min-height: 70vh; display: grid; place-items: center; padding: 40px 24px; text-align: center; }
   .gate__card { max-width: 440px; }
   .gate__ic { width: 56px; height: 56px; border-radius: 16px; background: var(--paper-2); border: 1px solid var(--line);
     display: grid; place-items: center; color: var(--ink); margin: 0 auto 22px; }
   .gate h1 { font-size: 26px; letter-spacing: -.02em; font-weight: 700; margin: 0; }
-  .gate p { font-size: 15px; color: var(--ink-2); margin: 12px auto 24px; max-width: 36ch; line-height: 1.6; }
+  .gate p { font-size: 15px; color: var(--ink-2); margin: 12px auto 24px; max-width: 38ch; line-height: 1.6; }
   .spin { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid var(--line-2); border-top-color: var(--ink); animation: spin .7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .hidden { display: none !important; }
 
-  @media (max-width: 820px) {
-    .wrap { padding: 0 18px; }
-    .cab__body { padding: 32px 18px 64px; }
-    .ptable__h { display: none; }
-    .ptable__row { grid-template-columns: 1fr auto; gap: 6px 14px; padding: 16px 18px; }
-    .ptable__row .pcell-name { grid-column: 1 / 2; grid-row: 1 / 3; }
-    .ptable__row .pcell-nv { grid-column: 2 / 3; grid-row: 1; }
-    .ptable__row .pcell-wv { display: none; }
-    .ptable__row .pcell-od, .ptable__row .pcell-kv { grid-column: 2 / 3; font-size: 12.5px; }
-    .cab__who { text-align: left; }
+  /* ── mobile (як на react.ink: ціни/наявність під назвою) ── */
+  @media (max-width: 860px) {
+    .wrap { padding: 0 16px; }
+    .cab__body { padding: 28px 16px 64px; }
     .brand__tag { display: none; }
+    .cab__who { display: none; }
+    .cab__head { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .cab__tools { align-items: flex-start; }
+    .row-head { display: none; }
+    .row { grid-template-columns: 1fr; gap: 8px; padding: 14px 16px; }
+    .desktop-only { display: none !important; }
+    .mobile-prices { display: flex; flex-direction: column; gap: 4px; }
+    .price-line { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .price-line .lbl { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+    .price-line .price { text-align: right; }
+    .mobile-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 2px; }
+    .cat-head { padding: 16px 16px 9px; }
+  }
+  @media (min-width: 861px) {
+    .mobile-meta { display: none !important; }
   }
 </style>
 </head>
@@ -115,7 +149,7 @@
   <div class="gate__card"><div class="spin" style="margin:0 auto"></div><p style="margin-top:20px">Завантажуємо кабінет…</p></div>
 </div>
 
-<!-- no/invalid token -->
+<!-- login / invalid token -->
 <div class="gate hidden" id="denyView">
   <div class="gate__card">
     <div class="gate__ic">
@@ -139,7 +173,7 @@
           <span class="cab__name" id="dCompany">—</span>
           <span class="cab__meta" id="dMeta">—</span>
         </div>
-        <button class="btn btn--ghost" type="button" id="logoutBtn">Вийти</button>
+        <button class="btn btn--ghost btn--sm" type="button" id="logoutBtn">Вийти</button>
       </div>
     </div>
   </header>
@@ -150,19 +184,31 @@
         <span class="kicker">Гуртовий прайс</span>
         <h1 class="cab__title">Прайс-лист дилера</h1>
         <p class="cab__sub" id="dSub"></p>
+        <div class="hero-date" id="heroDate"></div>
       </div>
-      <div class="cab__legend">
-        <span><i class="dotk ok"></i> в наявності</span>
-        <span><i class="dotk low"></i> мало</span>
-        <span><i class="dotk out"></i> немає</span>
+      <div class="cab__tools">
+        <div class="fx-pill" id="fxPill">
+          <span>USD/UAH<b id="fxUsd">—</b></span>
+          <span>EUR/UAH<b id="fxEur">—</b></span>
+        </div>
+        <button class="btn btn--solid btn--sm pdf-btn" id="pdfBtn" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 9V3h12v6M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <span class="hide-sm">PDF</span>
+        </button>
       </div>
     </div>
 
-    <div class="ptable" id="ptable">
-      <div class="ptable__h">
-        <span>Товар</span><span class="r">Без ПДВ</span><span class="r">З ПДВ</span><span class="r">Одеса</span><span class="r">Київ</span>
+    <div class="notice" id="notice"></div>
+
+    <div class="pricecard">
+      <div class="row-head">
+        <div>Назва</div>
+        <div class="num-col">Ціна без ПДВ</div>
+        <div class="num-col">Ціна з ПДВ</div>
+        <div>Наявність</div>
+        <div>Даташит</div>
       </div>
-      <!-- rows injected -->
+      <main id="catalog"><div class="loader">Завантаження цін…</div></main>
     </div>
 
     <p class="cab__note">Ціни вказані в USD за курсом НБУ на день відвантаження. Знижка тарифу <b id="dDiscNote">—</b> уже застосована до цін. Замовлення — через вашого менеджера.</p>
@@ -172,7 +218,11 @@
 <script src="https://accounts.google.com/gsi/client" async defer onload="renderGsi()"></script>
 <script>
 const API = 'https://price-api.doskevich.workers.dev';
+const FX_API = 'https://react-pricelist.doskevich.workers.dev';
 const GOOGLE_CLIENT_ID = '970560011376-htrf3g3s3at0id7iegomi6q9jshgj7ro.apps.googleusercontent.com';
+
+let DATA = [];   // та сама структура, що на react.ink: [{cat, slug, unit, items:[...]}]
+let DEALER = null;
 
 // ── Google-вхід: верифікована пошта → токен кабінету (dealer_auth_google) ──
 let gsiInited = false;
@@ -231,19 +281,153 @@ function deny(title, text) {
   show('denyView');
   renderGsi(); // GIS міг завантажитись поки екран був схований
 }
-
-function fmtPrice(v) {
-  if (v == null) return '<span class="pdash">—</span>';
-  const n = Number(v);
-  const s = n < 10 ? n.toFixed(3).replace(/0+$/, '').replace(/\.$/, '') : n.toLocaleString('en-US', { maximumFractionDigits: 2 });
-  return '$' + s;
+function showNotice(msg) {
+  const el = $('notice');
+  el.textContent = msg;
+  el.classList.add('show');
 }
-function stockCell(n) {
-  const v = Number(n) || 0;
-  const tone = v === 0 ? 'out' : v < 30 ? 'low' : 'ok';
-  return `<span class="stock stock--${tone}">${v === 0 ? 'немає' : v}</span>`;
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+// ── формати — як на react.ink ──
+const fmtPrice = v => {
+  if (v == null || !isFinite(v)) return null;
+  if (Math.abs(v) < 1) return v.toFixed(3).replace(/\.?0+$/, '').replace('.', ',');
+  return v.toLocaleString('uk-UA', { maximumFractionDigits: 0 }).replace(/\s/g, ' ');
+};
+const curSym = name => name === 'USD' ? '$' : (name === 'EUR' ? '€' : (name || '$'));
+const CODE2NAME = { '840': 'USD', '978': 'EUR', '980': 'UAH' };
+
+function setHeroDate() {
+  const d = new Date();
+  const months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+  $('heroDate').textContent = `Оновлено · ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// ── рендер каталогу — порт з react.ink (та сама структура DOM) ──
+function renderCatalog() {
+  const catalog = $('catalog');
+  catalog.innerHTML = '';
+  if (!DATA.length) {
+    catalog.innerHTML = `<div class="loader">Прайс порожній</div>`;
+    return;
+  }
+  const extractWatts = (s) => {
+    if (!s) return null;
+    const str = String(s);
+    const kw = str.match(/([\d]+(?:[.,][\d]+)?)\s*к[Вв]т(?![а-яА-ЯёЁіІїЇєЄґҐ])/i);
+    if (kw) return parseFloat(kw[1].replace(',', '.')) * 1000;
+    const w = str.match(/([\d]+(?:[.,][\d]+)?)\s*[Вв]т(?![а-яА-ЯёЁіІїЇєЄґҐ])/);
+    if (w) return parseFloat(w[1].replace(',', '.'));
+    const en = str.match(/([\d]+(?:[.,][\d]+)?)\s*([kK]?)[Ww]\b/);
+    if (en) {
+      const v = parseFloat(en[1].replace(',', '.'));
+      return en[2] ? v * 1000 : v;
+    }
+    return null;
+  };
+  const wattsForItem = it => extractWatts(it.name) || extractWatts(it.spec);
+  const dsIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
+
+  DATA.forEach(c => {
+    const sec = document.createElement('section');
+    sec.className = 'category';
+    sec.id = c.slug;
+    sec.innerHTML = `<div class="cat-head"><h2>${esc(c.cat)}</h2></div>`;
+
+    c.items.forEach(it => {
+      const w = (c.unit === '$/Вт') ? wattsForItem(it) : null;
+      const p1raw = it.no_vat && it.no_vat.price != null
+        ? (w ? Number(it.no_vat.price) / w : Number(it.no_vat.price)) : null;
+      const p2raw = it.with_vat && it.with_vat.price != null
+        ? (w ? Number(it.with_vat.price) / w : Number(it.with_vat.price)) : null;
+      const itemCur = (it.no_vat && it.no_vat.currency_name) || (it.with_vat && it.with_vat.currency_name) || null;
+      const cur = c.unit === '$/Вт' ? '$'
+                : itemCur ? curSym(itemCur)
+                : c.unit || '$';
+
+      const p1str = fmtPrice(p1raw);
+      const p2str = fmtPrice(p2raw);
+      const p1 = p1str != null ? `<span>${esc(p1str)}</span><span class="cur">${esc(cur)}</span>` : '—';
+      const p2 = p2str != null ? `<span>${esc(p2str)}</span><span class="cur">${esc(cur)}</span>` : '—';
+
+      const stockClass = it.stock === 'в наявності' ? '' : 'wait';
+      const dsCell = it.ds_url
+        ? `<a class="ds-link" href="${esc(it.ds_url)}" target="_blank" rel="noopener">${dsIcon}PDF</a>`
+        : '<span class="ds-link none">—</span>';
+
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML = `
+        <div class="prod-name">
+          <span>${esc(it.name)}</span>
+          ${it.spec ? `<span class="prod-sub">${esc(it.spec)}</span>` : ''}
+        </div>
+        <div class="price desktop-only${p1str == null ? ' empty' : ''}">${p1}</div>
+        <div class="price desktop-only${p2str == null ? ' empty' : ''}">${p2}</div>
+        <div class="desktop-only"><span class="stock ${stockClass}"><span class="led"></span>${esc(it.stock)}</span></div>
+        <div class="desktop-only">${dsCell}</div>
+
+        <div class="mobile-prices mobile-meta">
+          ${p2str != null ? `<div class="price-line"><span class="lbl">з ПДВ</span><span class="price">${p2}</span></div>` : ''}
+          ${p1str != null ? `<div class="price-line"><span class="lbl">без ПДВ</span><span class="price">${p1}</span></div>` : ''}
+          ${p1str == null && p2str == null ? `<div class="price-line empty"><span class="lbl">ціна</span><span class="price">—</span></div>` : ''}
+        </div>
+        <div class="mobile-foot mobile-meta">
+          <span class="stock ${stockClass}"><span class="led"></span>${esc(it.stock)}</span>
+          ${it.ds_url ? `<a class="ds-link" href="${esc(it.ds_url)}" target="_blank" rel="noopener">${dsIcon}PDF</a>` : ''}
+        </div>
+      `;
+      sec.appendChild(row);
+    });
+    catalog.appendChild(sec);
+  });
+}
+
+// ── дані: dealer_price_list → структура DATA як на react.ink ──
+// Ховаємо «немає» і позиції без цін (як на публічному прайсі).
+async function loadCatalog(token) {
+  const res = await fetch(`${API}/?action=dealer_price_list&token=${encodeURIComponent(token)}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.ok) throw new Error((data && data.error) || ('HTTP ' + res.status));
+
+  DATA = (data.categories || []).map(c => ({
+    cat: c.title, slug: c.slug, unit: c.unit || '',
+    items: (c.items || [])
+      .filter(it => {
+        if ((it.stock || '') === 'немає') return false;
+        return (it.no_vat != null && Number(it.no_vat) > 0) || (it.with_vat != null && Number(it.with_vat) > 0);
+      })
+      .map(it => {
+        const curName = CODE2NAME[it.currency] || 'USD';
+        return {
+          name: it.name || '',
+          spec: it.spec || '',
+          stock: it.stock || 'в наявності',
+          ds_url: it.datasheet || null,
+          no_vat:   it.no_vat   != null ? { price: Number(it.no_vat),   currency_name: curName } : null,
+          with_vat: it.with_vat != null ? { price: Number(it.with_vat), currency_name: curName } : null,
+        };
+      }),
+  })).filter(c => c.items.length > 0);
+  renderCatalog();
+}
+
+// ── FX НБУ +1% — як на react.ink ──
+async function loadFxNbu() {
+  try {
+    const r = await fetch(`${FX_API}/?action=fx_nbu`);
+    const d = await r.json();
+    if (!d.rates) return;
+    const fmtUah = v => v != null && isFinite(v) ? v.toFixed(2).replace('.', ',') : '—';
+    if (d.rates.USD && d.rates.USD.sell) $('fxUsd').textContent = fmtUah(d.rates.USD.sell);
+    if (d.rates.EUR && d.rates.EUR.sell) $('fxEur').textContent = fmtUah(d.rates.EUR.sell);
+    $('fxPill').style.display = 'inline-flex';
+  } catch (_) { /* silent */ }
+}
+
+// ── головний потік ──
 async function load() {
   const token = resolveToken();
   if (!token) { deny(); return; }
@@ -256,59 +440,201 @@ async function load() {
     if (!me.ok) return deny();
   } catch (_) { return deny('Помилка зʼєднання', 'Не вдалося завантажити кабінет. Спробуйте оновити сторінку.'); }
 
+  DEALER = me.dealer;
   const d = me.dealer;
   $('dCompany').textContent = d.company;
   const metaBits = [];
-  if (d.city) metaBits.push(d.city);
+  if (d.city) metaBits.push(esc(d.city));
   if (d.discount_pct) metaBits.push(`<span class="disc">−${d.discount_pct}%</span>`);
-  if (d.manager_name) metaBits.push('менеджер: ' + d.manager_name + (d.manager_contact ? ' · ' + d.manager_contact : ''));
+  if (d.manager_name) metaBits.push('менеджер: ' + esc(d.manager_name) + (d.manager_contact ? ' · ' + esc(d.manager_contact) : ''));
   $('dMeta').innerHTML = metaBits.join(' · ');
   $('dSub').textContent = d.company + (d.city ? ' · ' + d.city : '');
   $('dDiscNote').textContent = d.discount_pct ? `−${d.discount_pct}%` : 'не застосовується';
+  setHeroDate();
 
   show('cabView');
+  loadFxNbu();
 
   try {
-    const r = await fetch(`${API}/?action=dealer_price_list&token=${encodeURIComponent(token)}`);
-    const pl = await r.json();
-    if (!pl.ok) throw new Error('price list');
-    renderTable(pl.categories || []);
+    await loadCatalog(token);
   } catch (_) {
-    $('ptable').insertAdjacentHTML('beforeend', '<div class="ptable__cat">Не вдалося завантажити прайс. Оновіть сторінку.</div>');
+    $('catalog').innerHTML = '<div class="loader">Не вдалося завантажити прайс. Оновіть сторінку.</div>';
   }
-}
-
-function renderTable(categories) {
-  const t = $('ptable');
-  let html = '';
-  for (const c of categories) {
-    if (!c.items || !c.items.length) continue;
-    html += `<div class="ptable__cat">${c.title || ''}</div>`;
-    for (const it of c.items) {
-      html += `<div class="ptable__row">
-        <div class="pcell-name">
-          <div class="pname">${escapeHtml(it.name)}</div>
-          ${it.spec ? `<div class="pspec">${escapeHtml(it.spec)}</div>` : ''}
-        </div>
-        <span class="r pcell-nv"><span class="pprice">${fmtPrice(it.no_vat)}</span></span>
-        <span class="r pcell-wv"><span class="pprice ${it.with_vat == null ? 'muted' : ''}">${fmtPrice(it.with_vat)}</span></span>
-        <span class="r pcell-od">${stockCell(it.odessa)}</span>
-        <span class="r pcell-kv">${stockCell(it.kyiv)}</span>
-      </div>`;
-    }
-  }
-  t.querySelectorAll('.ptable__cat, .ptable__row').forEach(el => el.remove());
-  t.insertAdjacentHTML('beforeend', html || '<div class="ptable__cat">Прайс порожній</div>');
-}
-
-function escapeHtml(s) {
-  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 $('logoutBtn').addEventListener('click', () => {
   try { localStorage.removeItem('dealer_token'); } catch (_) {}
   location.href = '/verify';
 });
+
+// ── PDF — порт з react.ink (pdfmake), шапка з даними дилера ──
+let _pdfLibPromise = null;
+function loadPdfLib() {
+  if (_pdfLibPromise) return _pdfLibPromise;
+  _pdfLibPromise = new Promise((resolve, reject) => {
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js';
+      s2.onload = () => resolve(window.pdfMake);
+      s2.onerror = () => reject(new Error('CDN vfs_fonts недоступний'));
+      document.head.appendChild(s2);
+    };
+    s1.onerror = () => reject(new Error('CDN pdfmake недоступний'));
+    document.head.appendChild(s1);
+  });
+  return _pdfLibPromise;
+}
+
+function buildPdfDocDefinition() {
+  const d = new Date();
+  const months = ['січня','лютого','березня','квітня','травня','червня','липня','серпня','вересня','жовтня','листопада','грудня'];
+  const dateStr = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+
+  const wattsFromSpec = spec => {
+    const m = spec ? String(spec).match(/([\d.,]+)\s*Вт/i) : null;
+    return m ? parseFloat(m[1].replace(',', '.')) : null;
+  };
+  const fmtNum = v => {
+    if (v == null || !isFinite(v)) return '—';
+    if (Math.abs(v) < 1) return v.toFixed(3).replace(/\.?0+$/, '');
+    return v.toLocaleString('uk-UA', { maximumFractionDigits: 0 });
+  };
+
+  const content = [
+    { text: 'React', style: 'brand' },
+    { text: 'Швидка дистрибуція обладнання з альтернативної енергетики',
+      style: 'brandSub', margin: [0, 2, 0, 14] },
+    {
+      columns: [
+        { stack: [
+          { text: 'ОЛЕКСАНДРА', style: 'metaLabel' },
+          { text: '+380 63 325 61 10', style: 'metaValue' }
+        ]},
+        { text: '' },
+        { text: '' },
+      ],
+      margin: [0, 0, 0, 10],
+    },
+    {
+      columns: [
+        { stack: [
+          { text: 'ОФІС', style: 'metaLabel' },
+          { text: 'Одеса, вул. Велика Арнаутська, 15', style: 'metaValue' }
+        ]},
+        { stack: [
+          { text: 'СКЛАД · КИЇВ', style: 'metaLabel' },
+          { text: 'м. Вишневе, вул. Промислова, 10', style: 'metaValue' }
+        ]},
+        { stack: [
+          { text: 'СКЛАД · ОДЕСА', style: 'metaLabel' },
+          { text: 'Одеса, вул. Чигиринська, 21', style: 'metaValue' }
+        ]},
+      ],
+      margin: [0, 0, 0, 18],
+    },
+    { text: `Оновлено · ${dateStr}`, style: 'dateLine', margin: [0, 0, 0, 4] },
+    ...(DEALER ? [{
+      text: `Дилер · ${DEALER.company}${DEALER.discount_pct ? ` · знижка −${DEALER.discount_pct}% врахована в цінах` : ''}`,
+      style: 'dateLine', margin: [0, 0, 0, 14],
+    }] : []),
+  ];
+
+  DATA.forEach(c => {
+    if (!c.items.length) return;
+    const isW = c.unit === '$/Вт';
+    content.push({ text: c.cat, style: 'catHead', margin: [0, 12, 0, 4] });
+    const body = [[
+      { text: 'Назва', style: 'th' },
+      { text: 'Без ПДВ', style: 'th', alignment: 'center' },
+      { text: 'З ПДВ', style: 'th', alignment: 'center' },
+      { text: 'Наявність', style: 'th' },
+    ]];
+    c.items.forEach(it => {
+      const w = isW ? wattsFromSpec(it.spec) : null;
+      const itemCur = (it.no_vat && it.no_vat.currency_name) || (it.with_vat && it.with_vat.currency_name) || null;
+      const cur = isW ? '$' : (itemCur ? curSym(itemCur) : (c.unit || '$'));
+      const p1raw = it.no_vat && it.no_vat.price != null ? Number(it.no_vat.price) : null;
+      const p2raw = it.with_vat && it.with_vat.price != null ? Number(it.with_vat.price) : null;
+      const p1 = p1raw != null ? (w ? p1raw / w : p1raw) : null;
+      const p2 = p2raw != null ? (w ? p2raw / w : p2raw) : null;
+      const p1s = p1 != null ? `${fmtNum(p1)} ${cur}` : '—';
+      const p2s = p2 != null ? `${fmtNum(p2)} ${cur}` : '—';
+      body.push([
+        { stack: [
+            { text: it.name, style: 'tdName' },
+            ...(it.spec ? [{ text: it.spec, style: 'tdSub' }] : []),
+        ] },
+        { text: p1s, alignment: 'center', style: 'tdNum' },
+        { text: p2s, alignment: 'center', style: 'tdNum' },
+        { text: it.stock || '', style: 'tdStock' },
+      ]);
+    });
+    content.push({
+      table: { headerRows: 1, widths: ['*', 70, 70, 80], body },
+      layout: {
+        hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length) ? 0.6 : 0.3,
+        vLineWidth: () => 0,
+        hLineColor: () => '#d0d0cd',
+        paddingTop:    () => 6,
+        paddingBottom: () => 6,
+        paddingLeft:   () => 4,
+        paddingRight:  () => 4,
+      },
+    });
+  });
+
+  content.push({
+    text: 'Ціни вказані у доларах США (USD). Остаточна вартість формується за курсом НБУ +1% на день оплати.',
+    style: 'terms', margin: [0, 18, 0, 0],
+  });
+
+  return {
+    pageSize: 'A4',
+    pageMargins: [36, 32, 36, 40],
+    content,
+    footer: (currentPage, pageCount) => ({
+      text: `${currentPage} / ${pageCount}`,
+      alignment: 'center', fontSize: 8, color: '#999', margin: [0, 12, 0, 0],
+    }),
+    defaultStyle: { font: 'Roboto', fontSize: 9, color: '#1c1c1c' },
+    styles: {
+      brand:     { fontSize: 22, bold: true },
+      brandSub:  { fontSize: 8, color: '#7a7a7a', characterSpacing: 1 },
+      metaLabel: { fontSize: 7, color: '#8a8a8a', characterSpacing: 1 },
+      metaValue: { fontSize: 9 },
+      dateLine:  { fontSize: 8, color: '#7a7a7a', characterSpacing: 1 },
+      catHead:   { fontSize: 12, bold: true },
+      th:        { fontSize: 8, bold: true, color: '#6a6a6a', characterSpacing: 0.5 },
+      tdName:    { fontSize: 9, bold: true },
+      tdSub:     { fontSize: 8, color: '#7a7a7a', margin: [0, 1, 0, 0] },
+      tdNum:     { fontSize: 9 },
+      tdStock:   { fontSize: 8, color: '#4a4a4a' },
+      terms:     { fontSize: 7, color: '#8a8a8a', italics: true },
+    },
+  };
+}
+
+async function downloadPDF() {
+  const btn = $('pdfBtn');
+  const label = btn.querySelector('.hide-sm');
+  const origLabel = label ? label.textContent : '';
+  btn.disabled = true;
+  if (label) label.textContent = 'Готуємо…';
+  try {
+    const pdfMake = await loadPdfLib();
+    const today = new Date();
+    const yyyymmdd = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const def = buildPdfDocDefinition();
+    pdfMake.createPdf(def).download(`React-Прайс-${yyyymmdd}.pdf`);
+  } catch (e) {
+    showNotice('Не вдалося згенерувати PDF: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    if (label) label.textContent = origLabel;
+  }
+}
 
 load();
 </script>
