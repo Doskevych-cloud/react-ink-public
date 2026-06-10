@@ -121,9 +121,11 @@
     <div class="gate__ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.5 12.5 8-8M16 3l3 3M14 6l2 2"/></svg>
     </div>
-    <h1 id="denyTitle">Доступ не знайдено</h1>
-    <p id="denyText">Це посилання недійсне або доступ відкликано. Зверніться до вашого менеджера React або подайте заявку на верифікацію.</p>
-    <a class="btn btn--solid" href="/verify">Подати заявку <span class="arr"><svg width="24" height="6" viewBox="0 0 170 44" fill="currentColor"><path d="M0 0 L170 0 L126 44 L114 32 L128 18 L0 17 Z"/></svg></span></a>
+    <h1 id="denyTitle">Вхід до кабінету</h1>
+    <p id="denyText">Увійдіть через Google з поштою, яку вказували в заявці, або відкрийте кабінет за персональним посиланням від менеджера.</p>
+    <div id="gsiWrap" style="display:flex;justify-content:center;margin:0 0 16px"><div id="gsiBtn"></div></div>
+    <p id="gsiErr" style="display:none;font-size:13.5px;color:var(--danger);background:rgba(194,69,47,.07);border:1px solid rgba(194,69,47,.18);border-radius:8px;padding:11px 14px;line-height:1.5;margin:0 0 16px"></p>
+    <a class="btn btn--ghost" href="/verify">Подати заявку <span class="arr"><svg width="24" height="6" viewBox="0 0 170 44" fill="currentColor"><path d="M0 0 L170 0 L126 44 L114 32 L128 18 L0 17 Z"/></svg></span></a>
   </div>
 </div>
 
@@ -167,8 +169,44 @@
   </div>
 </div>
 
+<script src="https://accounts.google.com/gsi/client" async defer onload="renderGsi()"></script>
 <script>
 const API = 'https://price-api.doskevich.workers.dev';
+const GOOGLE_CLIENT_ID = '970560011376-htrf3g3s3at0id7iegomi6q9jshgj7ro.apps.googleusercontent.com';
+
+// ── Google-вхід: верифікована пошта → токен кабінету (dealer_auth_google) ──
+let gsiInited = false;
+function renderGsi() {
+  const el = document.getElementById('gsiBtn');
+  if (!el || !window.google || !google.accounts) return;
+  if (!gsiInited) {
+    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCred });
+    gsiInited = true;
+  }
+  el.innerHTML = '';
+  google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: 'uk', width: 280 });
+}
+function gsiError(msg) {
+  const e = document.getElementById('gsiErr');
+  e.textContent = msg; e.style.display = 'block';
+}
+async function onGoogleCred(resp) {
+  try {
+    const r = await fetch(`${API}/?action=dealer_auth_google`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: resp.credential }),
+    });
+    const out = await r.json().catch(() => ({}));
+    if (r.ok && out.ok && out.token) {
+      try { localStorage.setItem('dealer_token', out.token); } catch (_) {}
+      location.href = '/cabinet';
+    } else if (r.status === 403) {
+      gsiError('Цю Google-пошту не підключено до кабінету. Подайте заявку на верифікацію або зверніться до менеджера.');
+    } else {
+      gsiError('Не вдалося увійти. Спробуйте ще раз.');
+    }
+  } catch (_) { gsiError('Помилка мережі. Спробуйте ще раз.'); }
+}
 
 // ── token: URL → localStorage, далі чистимо URL ──
 function resolveToken() {
@@ -191,6 +229,7 @@ function deny(title, text) {
   if (title) $('denyTitle').textContent = title;
   if (text) $('denyText').textContent = text;
   show('denyView');
+  renderGsi(); // GIS міг завантажитись поки екран був схований
 }
 
 function fmtPrice(v) {
@@ -207,7 +246,7 @@ function stockCell(n) {
 
 async function load() {
   const token = resolveToken();
-  if (!token) { deny('Потрібне посилання', 'Відкрийте кабінет за персональним посиланням від менеджера React, або подайте заявку на верифікацію.'); return; }
+  if (!token) { deny(); return; }
 
   let me;
   try {
