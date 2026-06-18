@@ -209,13 +209,14 @@ gtag('config', 'G-8P7TF4SV17');
   .combo .control:disabled { opacity: .55; cursor: not-allowed; background: var(--paper); }
   .combo__opt .combo__rgn { color: var(--ink-3); font-size: 13px; }
 
-  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--paper); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; }
+  .seg { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); background: var(--paper); border: 1px solid var(--line-2); border-radius: 10px; padding: 4px; }
+  .seg__ind { position: absolute; top: 4px; left: 4px; bottom: 4px; width: calc((100% - 8px) / 3); background: var(--ink); border-radius: 7px; box-shadow: var(--shadow-sm); transition: transform .28s var(--ease); }
   .seg button {
-    border: 0; background: transparent; border-radius: 7px; padding: 9px 8px; font-size: 14px; font-weight: 600;
-    color: var(--ink-2); transition: color .2s, background .2s, box-shadow .2s; letter-spacing: -.01em;
+    position: relative; z-index: 1; border: 0; background: transparent; border-radius: 7px; padding: 10px 8px; font-size: 14px; font-weight: 600;
+    color: var(--ink-2); transition: color .2s; letter-spacing: -.01em;
   }
   .seg button:hover { color: var(--ink); }
-  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); box-shadow: var(--shadow-sm); }
+  .seg button[aria-pressed="true"] { color: var(--paper); }
 
   .consent { margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
   .consent > input { position: absolute; opacity: 0; width: 1px; height: 1px; }
@@ -244,6 +245,33 @@ gtag('config', 'G-8P7TF4SV17');
 
   .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); border-top-color: #fff; animation: spin .7s linear infinite; display: inline-block; vertical-align: -3px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* form header + ≈1хв pill */
+  .form-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 4px; }
+  .form-head__caps { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 7px; }
+  .form-head__title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .pill-min { flex: none; display: inline-flex; align-items: center; gap: 6px; background: var(--paper-2); border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  /* progress */
+  .progress { margin: 18px 0 26px; }
+  .progress__lbl { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-bottom: 8px; }
+  .progress__track { height: 6px; background: var(--paper-3); border-radius: 999px; overflow: hidden; }
+  .progress__fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .35s ease; width: 0; }
+  /* numbered section heading */
+  .sec { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; }
+  .sec--first { margin-top: 0; }
+  .sec__n { flex: none; width: 24px; height: 24px; border-radius: 7px; background: var(--accent-wash); color: var(--accent-deep); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
+  .sec__t { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
+  /* success timeline */
+  .timeline { text-align: left; max-width: 380px; margin: 28px auto 0; }
+  .tl { display: flex; gap: 14px; align-items: flex-start; }
+  .tl__rail { display: flex; flex-direction: column; align-items: center; align-self: stretch; }
+  .tl__dot { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; }
+  .tl__dot--done { background: var(--accent); color: #fff; }
+  .tl__dot--todo { background: #fff; border: 2px solid var(--line-2); }
+  .tl__conn { flex: 1; width: 2px; background: var(--line-2); margin: 2px 0; }
+  .tl__body { padding-bottom: 16px; }
+  .tl__t { font-size: 14.5px; font-weight: 600; }
+  .tl__d { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
 
   /* success */
   .success { display: none; text-align: center; padding: 20px 12px 8px; animation: rise .6s var(--ease) both; }
@@ -397,9 +425,28 @@ gtag('config', 'G-8P7TF4SV17');
           <form id="verifyForm" novalidate>
             <div class="form-banner" id="formBanner" role="alert" aria-live="assertive"></div>
 
+            <div class="form-head">
+              <div>
+                <div class="form-head__caps">Заявка партнера</div>
+                <div class="form-head__title">Заповніть дані</div>
+              </div>
+              <span class="pill-min">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-deep)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+                ≈ 1 хв
+              </span>
+            </div>
+
+            <div class="progress">
+              <div class="progress__lbl" id="pctLabel">Заповнено 0%</div>
+              <div class="progress__track"><div class="progress__fill" id="pctFill"></div></div>
+            </div>
+
+            <div class="sec sec--first"><span class="sec__n">1</span><span class="sec__t">Реквізити контрагента</span></div>
+
             <div class="field">
               <label>Тип контрагента <span class="req">*</span></label>
               <div class="seg" role="group" aria-label="Тип контрагента" id="entitySeg">
+                <span class="seg__ind" id="segInd" aria-hidden="true"></span>
                 <button type="button" data-val="ТОВ" aria-pressed="true">ТОВ</button>
                 <button type="button" data-val="ФОП" aria-pressed="false">ФОП</button>
                 <button type="button" data-val="Фізособа" aria-pressed="false">Фізособа</button>
@@ -419,6 +466,8 @@ gtag('config', 'G-8P7TF4SV17');
               </div>
             </div>
 
+            <div class="sec"><span class="sec__n">2</span><span class="sec__t">Контактна особа</span></div>
+
             <div class="form-row">
               <div class="field" data-field="person">
                 <label for="f_person">Контактна особа <span class="req">*</span></label>
@@ -435,12 +484,15 @@ gtag('config', 'G-8P7TF4SV17');
               </div>
             </div>
 
+            <div class="field" data-field="email">
+              <label for="f_email">E-mail <span class="opt">— Google-пошта, для входу в кабінет</span> <span class="req">*</span></label>
+              <input id="f_email" class="control" type="email" name="email" placeholder="name@company.ua" required aria-required="true" />
+              <div class="err" data-err="email"></div>
+            </div>
+
+            <div class="sec"><span class="sec__n">3</span><span class="sec__t">Локація</span></div>
+
             <div class="form-row">
-              <div class="field" data-field="email">
-                <label for="f_email">E-mail <span class="opt">— Google-пошта, для входу в кабінет</span></label>
-                <input id="f_email" class="control" type="email" name="email" placeholder="name@company.ua" />
-                <div class="err" data-err="email"></div>
-              </div>
               <div class="field" data-field="region">
                 <label for="f_region">Область <span class="req">*</span></label>
                 <div class="combo" id="regionCombo">
@@ -452,30 +504,33 @@ gtag('config', 'G-8P7TF4SV17');
                 </div>
                 <div class="err" data-err="region"></div>
               </div>
+              <div class="field" data-field="settlement">
+                <label for="f_settlement">Населений пункт <span class="req">*</span> <span class="opt" data-settlement-hint>— спершу оберіть область</span></label>
+                <div class="combo" id="settlementCombo">
+                  <div class="combo__field">
+                    <input id="f_settlement" class="control" name="settlement" placeholder="Спершу оберіть область" autocomplete="off" disabled role="combobox" aria-expanded="false" aria-autocomplete="list" />
+                    <span class="combo__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
+                  </div>
+                  <ul class="combo__list" role="listbox" hidden></ul>
+                </div>
+                <div class="err" data-err="settlement"></div>
+              </div>
             </div>
 
-            <div class="field" data-field="settlement">
-              <label for="f_settlement">Населений пункт <span class="opt" data-settlement-hint>— спершу оберіть область</span></label>
-              <div class="combo" id="settlementCombo">
-                <div class="combo__field">
-                  <input id="f_settlement" class="control" name="settlement" placeholder="Спершу оберіть область" autocomplete="off" disabled role="combobox" aria-expanded="false" aria-autocomplete="list" />
-                  <span class="combo__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
-                </div>
-                <ul class="combo__list" role="listbox" hidden></ul>
-              </div>
-              <div class="err" data-err="settlement"></div>
-            </div>
+            <div class="sec"><span class="sec__n">4</span><span class="sec__t">Профіль співпраці</span></div>
 
             <div class="form-row">
-              <div class="field">
+              <div class="field" data-field="profile">
                 <label for="f_profile">Профіль діяльності <span class="req">*</span></label>
-                <select id="f_profile" class="control" name="profile">
+                <select id="f_profile" class="control" name="profile" required aria-required="true">
+                  <option value="">Оберіть профіль</option>
                   <option>Інсталятор</option>
                   <option>Магазин / Роздріб</option>
                   <option>Проєктна організація</option>
                   <option>Субдистрибʼютор</option>
                   <option>Інше</option>
                 </select>
+                <div class="err" data-err="profile"></div>
               </div>
               <div class="field" data-field="volume">
                 <label for="f_volume">Очікуваний обсяг / міс <span class="req">*</span></label>
@@ -492,8 +547,8 @@ gtag('config', 'G-8P7TF4SV17');
             </div>
 
             <div class="field" data-field="note">
-              <label for="f_note">Коментар <span class="req">*</span></label>
-              <textarea id="f_note" class="control" name="note" placeholder="Що для вас ключове в співпраці з постачальником?" required aria-required="true"></textarea>
+              <label for="f_note">Коментар <span class="opt">— необовʼязково</span></label>
+              <textarea id="f_note" class="control" name="note" placeholder="Що для вас ключове в співпраці з постачальником?"></textarea>
               <div class="err" data-err="note"></div>
             </div>
 
@@ -528,6 +583,23 @@ gtag('config', 'G-8P7TF4SV17');
             <div class="success__ticket">
               <span>Номер заявки <b class="mono" id="ticketNo">RC-000000</b></span>
               <button class="copy" type="button" id="copyTicket">Копіювати</button>
+            </div>
+            <div class="timeline">
+              <div class="tl">
+                <div class="tl__rail">
+                  <div class="tl__dot tl__dot--done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 6"/></svg></div>
+                  <div class="tl__conn"></div>
+                </div>
+                <div class="tl__body"><div class="tl__t">Заявка отримана</div><div class="tl__d">Сьогодні · щойно</div></div>
+              </div>
+              <div class="tl">
+                <div class="tl__rail"><div class="tl__dot tl__dot--todo"></div><div class="tl__conn"></div></div>
+                <div class="tl__body"><div class="tl__t">Перевірка реквізитів</div><div class="tl__d">До кінця робочого дня</div></div>
+              </div>
+              <div class="tl">
+                <div class="tl__rail"><div class="tl__dot tl__dot--todo"></div></div>
+                <div class="tl__body"><div class="tl__t">Доступ до кабінету</div><div class="tl__d">Логін надійде на вашу Google-пошту</div></div>
+              </div>
             </div>
             <div class="success__next">
               <a class="btn btn--solid" href="#top">На головну <span class="arr" data-arrow></span></a>
@@ -695,6 +767,9 @@ const btnLabel = submitBtn.querySelector('.btn-label');
 let entity = 'ТОВ';
 const COMPANY_PH = { 'ТОВ': 'ТОВ «Сонячний дім»', 'ФОП': 'ФОП «Солар Степан Дмитрович»' };
 function applyEntity() {
+  const idx = entity === 'ТОВ' ? 0 : (entity === 'ФОП' ? 1 : 2);
+  const ind = document.getElementById('segInd');
+  if (ind) ind.style.transform = `translateX(${idx * 100}%)`;
   const isFiz = entity === 'Фізособа';
   const row = document.getElementById('rowIdentity');
   if (row) row.style.display = isFiz ? 'none' : '';
@@ -713,6 +788,7 @@ function applyEntity() {
     if (nameEl) nameEl.textContent = isFop ? 'ІПН' : 'ЄДРПОУ';
     if (edrpou) edrpou.placeholder = isFop ? '0000000000' : '00000000';
   }
+  if (typeof updateProgress === 'function') updateProgress();
 }
 document.getElementById('entitySeg').addEventListener('click', e => {
   const b = e.target.closest('button[data-val]');
@@ -721,6 +797,40 @@ document.getElementById('entitySeg').addEventListener('click', e => {
   document.querySelectorAll('#entitySeg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
   applyEntity();
 });
+
+// ── валідація (єдині правила для прогрес-бара і сабміту) ──
+const fieldVal = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
+function validate(name) {
+  switch (name) {
+    case 'company': return entity === 'Фізособа' ? '' : (!fieldVal('company') ? 'Вкажіть назву компанії' : '');
+    case 'edrpou': { if (entity === 'Фізособа') return ''; const d = fieldVal('edrpou').replace(/\D/g, ''); const len = entity === 'ФОП' ? 10 : 8;
+      if (!d) return entity === 'ФОП' ? 'Вкажіть ІПН' : 'Вкажіть ЄДРПОУ'; if (d.length !== len) return entity === 'ФОП' ? 'ІПН — 10 цифр' : 'ЄДРПОУ — 8 цифр'; return ''; }
+    case 'person': return !fieldVal('person') ? 'Вкажіть контактну особу' : '';
+    case 'phone': { const d = fieldVal('phone').replace(/\D/g, ''); if (!d) return 'Вкажіть телефон'; if (d.length !== 10) return 'Номер має містити 10 цифр (з 0, після +38)'; return ''; }
+    case 'email': { const e = fieldVal('email'); if (!e) return 'Вкажіть e-mail'; if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return 'Невірний формат e-mail'; return ''; }
+    case 'region': return !fieldVal('region') ? 'Оберіть область' : '';
+    case 'settlement': return !fieldVal('settlement') ? 'Оберіть населений пункт' : '';
+    case 'profile': return !fieldVal('profile') ? 'Оберіть профіль' : '';
+    case 'volume': return !fieldVal('volume') ? 'Оберіть обсяг' : '';
+    default: return '';
+  }
+}
+function requiredKeys() {
+  const base = ['person','phone','email','region','settlement','profile','volume'];
+  return entity !== 'Фізособа' ? ['company','edrpou'].concat(base) : base;
+}
+function updateProgress() {
+  const keys = requiredKeys();
+  const done = keys.filter(k => !validate(k)).length + (document.getElementById('consent').checked ? 1 : 0);
+  const pct = Math.round(done / (keys.length + 1) * 100);
+  const fill = document.getElementById('pctFill'), lbl = document.getElementById('pctLabel');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl) lbl.textContent = 'Заповнено ' + pct + '%';
+}
+form.addEventListener('input', updateProgress);
+form.addEventListener('change', updateProgress);
+document.getElementById('consent').addEventListener('change', updateProgress);
+
 applyEntity();
 
 // ── Населений пункт — combobox через Nova Poshta (getSettlements по області) ──
@@ -763,7 +873,7 @@ const settlementCombo = (function initSettlementCombo() {
     open = true; list.hidden = false; input.setAttribute('aria-expanded','true');
     list.innerHTML = current.map((o, i) => `<li class="combo__opt${i === active ? ' is-active' : ''}" role="option" data-i="${i}">${o.html}</li>`).join('');
   }
-  function choose(o) { input.value = o.value; closeList(); }
+  function choose(o) { input.value = o.value; closeList(); if (typeof updateProgress === 'function') updateProgress(); }
   async function search(q) {
     if (!areaRef) { openMsg('Спершу оберіть область'); return; }
     if (q.length < 2) { current = []; openMsg('Введіть мінімум 2 літери'); return; }
@@ -791,8 +901,9 @@ const settlementCombo = (function initSettlementCombo() {
     lastName = name;
     areaRef = NP_AREA_REF[name] || '';
     input.value = ''; current = []; active = -1; closeList();
-    if (areaRef) { input.disabled = false; input.placeholder = 'Почніть вводити назву'; if (hint) hint.textContent = '— необовʼязково'; }
+    if (areaRef) { input.disabled = false; input.placeholder = 'Почніть вводити назву'; if (hint) hint.textContent = ''; }
     else { input.disabled = true; input.placeholder = 'Спершу оберіть область'; if (hint) hint.textContent = '— спершу оберіть область'; }
+    if (typeof updateProgress === 'function') updateProgress();
   }
   input.addEventListener('focus', () => { if (input.disabled) return; const q = input.value.trim(); if (current.length) render(); else search(q); });
   input.addEventListener('input', () => { active = 0; clearTimeout(timer); const q = input.value.trim(); timer = setTimeout(() => search(q), 250); });
@@ -827,7 +938,7 @@ const OBLASTS = ['Вінницька','Волинська','Дніпропетр
   }
   function openList() { open = true; list.hidden = false; input.setAttribute('aria-expanded', 'true'); render(); }
   function closeList() { open = false; list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
-  function choose(o) { input.value = o; closeList(); settlementCombo.setOblast(o); }
+  function choose(o) { input.value = o; closeList(); settlementCombo.setOblast(o); if (typeof updateProgress === 'function') updateProgress(); }
   input.addEventListener('focus', openList);
   input.addEventListener('input', () => { active = 0; openList(); settlementCombo.setOblast(input.value.trim()); });
   input.addEventListener('keydown', (e) => {
@@ -880,40 +991,17 @@ form.addEventListener('submit', async (e) => {
   // honeypot — мовчазний «успіх»
   if (form.querySelector('[name="company_url"]').value.trim()) { showSuccess(); return; }
 
-  const v = (n) => form.querySelector(`[name="${n}"]`).value.trim();
-  const company = v('company'), edrpou = v('edrpou'), person = v('person'),
-        phoneRaw = v('phone'), email = v('email'),
-        region = v('region'), volume = v('volume'), note = v('note');
+  const v = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
   const consent = document.getElementById('consent').checked;
 
-  let ok = true, firstBad = null;
-  const fail = (name, msg) => { fieldError(name, msg); if (!firstBad) firstBad = name; ok = false; };
-
-  // Усі поля обовʼязкові, крім e-mail. Для Фізособи назва компанії та ЄДРПОУ приховані.
-  if (entity !== 'Фізособа') {
-    if (!company) fail('company', 'Вкажіть назву компанії');
-    const codeDigits = edrpou.replace(/\D/g, '');
-    if (entity === 'ФОП') {
-      if (!edrpou) fail('edrpou', 'Вкажіть ІПН');
-      else if (codeDigits.length !== 10) fail('edrpou', 'ІПН — 10 цифр');
-    } else {
-      if (!edrpou) fail('edrpou', 'Вкажіть ЄДРПОУ');
-      else if (codeDigits.length !== 8) fail('edrpou', 'ЄДРПОУ — 8 цифр');
-    }
-  }
-  if (!person) fail('person', 'Вкажіть контактну особу');
-  const digits = phoneRaw.replace(/\D/g, '');
-  if (!phoneRaw) fail('phone', 'Вкажіть телефон');
-  else if (digits.length !== 10) fail('phone', 'Номер має містити 10 цифр (з 0, після +38)');
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) fail('email', 'Невірний формат e-mail');
-  if (!region) fail('region', 'Оберіть область');
-  if (!volume) fail('volume', 'Оберіть обсяг');
-  if (!note) fail('note', 'Додайте коментар');
-  if (!consent) { document.getElementById('consentWrap').classList.add('invalid'); if (!firstBad) firstBad = 'consent'; ok = false; }
-
-  if (!ok) {
+  // Валідація — ті самі правила validate(), що й у прогрес-барі.
+  let firstBad = null;
+  requiredKeys().forEach(k => { const msg = validate(k); if (msg) { fieldError(k, msg); if (!firstBad) firstBad = k; } });
+  if (!consent) { document.getElementById('consentWrap').classList.add('invalid'); if (!firstBad) firstBad = 'consent'; }
+  updateProgress();
+  if (firstBad) {
     const el = firstBad === 'consent' ? document.getElementById('consent') : form.querySelector(`[name="${firstBad}"]`);
-    if (el) el.focus();
+    if (el && el.focus) el.focus();
     return;
   }
 
@@ -921,18 +1009,18 @@ form.addEventListener('submit', async (e) => {
   // у Planfix (коментар) і показався користувачу на екрані успіху.
   const ticket = randTicket();
 
-  // payload → бекенд (мапа полів дизайну на наш dealer_signup)
+  // payload → бекенд (мапа полів на наш dealer_signup; city=область, settlement=НП)
   const payload = {
     org_type: entity,
-    company,
-    code: edrpou,
-    contact: person,
-    phone: '+38' + phoneRaw.replace(/\D/g, ''),
-    email,
+    company: entity === 'Фізособа' ? '' : v('company'),
+    code: entity === 'Фізособа' ? '' : v('edrpou'),
+    contact: v('person'),
+    phone: '+38' + v('phone').replace(/\D/g, ''),
+    email: v('email'),
     city: v('region'),
     settlement: v('settlement'),
-    field: form.querySelector('[name="profile"]').value,
-    volume: form.querySelector('[name="volume"]').value,
+    field: v('profile'),
+    volume: v('volume'),
     comment: v('note'),
     ref: ticket,
   };
