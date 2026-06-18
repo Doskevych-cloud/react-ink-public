@@ -218,20 +218,6 @@ gtag('config', 'G-8P7TF4SV17');
   .seg button:hover { color: var(--ink); }
   .seg button[aria-pressed="true"] { color: var(--paper); }
 
-  .consent { margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
-  .consent > input { position: absolute; opacity: 0; width: 1px; height: 1px; }
-  .checkbox {
-    flex: 0 0 auto; width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid var(--line-2);
-    background: var(--paper); display: grid; place-items: center; transition: all .2s var(--ease); margin-top: 1px; cursor: pointer;
-  }
-  .checkbox svg { opacity: 0; transform: scale(.5); transition: all .2s var(--ease); color: #fff; }
-  .consent > input:checked + .checkbox { background: var(--accent); border-color: var(--accent); }
-  .consent > input:checked + .checkbox svg { opacity: 1; transform: scale(1); }
-  .consent > input:focus-visible + .checkbox { box-shadow: 0 0 0 4px var(--accent-wash); }
-  .consent label.txt { font-size: 13.5px; color: var(--ink-2); line-height: 1.5; cursor: pointer; user-select: none; }
-  .consent.invalid .checkbox { border-color: var(--danger); }
-  .consent a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--line-2); }
-
   .form-foot { margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
   .form-foot .btn { width: 100%; justify-content: center; }
   .form-foot .small { font-size: 13px; color: var(--ink-3); display: flex; align-items: center; gap: 8px; text-align: center; }
@@ -256,11 +242,6 @@ gtag('config', 'G-8P7TF4SV17');
   .progress__lbl { font-size: 12px; font-weight: 600; color: var(--ink-3); margin-bottom: 8px; }
   .progress__track { height: 6px; background: var(--paper-3); border-radius: 999px; overflow: hidden; }
   .progress__fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .35s ease; width: 0; }
-  /* numbered section heading */
-  .sec { display: flex; align-items: center; gap: 10px; margin: 30px 0 16px; }
-  .sec--first { margin-top: 0; }
-  .sec__n { flex: none; width: 24px; height: 24px; border-radius: 7px; background: var(--accent-wash); color: var(--accent-deep); font-size: 13px; font-weight: 700; display: grid; place-items: center; }
-  .sec__t { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
   /* success timeline */
   .timeline { text-align: left; max-width: 380px; margin: 28px auto 0; }
   .tl { display: flex; gap: 14px; align-items: flex-start; }
@@ -414,7 +395,7 @@ gtag('config', 'G-8P7TF4SV17');
               <span class="vstep__ic" data-ic="key"></span>
               <span class="vstep__txt">
                 <span class="vstep__t">Отримуєте доступ</span>
-                <span class="vstep__d">Логін до кабінету з гуртовим прайсом, залишками та умовами дистрибуції.</span>
+                <span class="vstep__d">До кабінету з гуртовим прайсом та залишками.</span>
               </span>
             </li>
           </ol>
@@ -441,8 +422,6 @@ gtag('config', 'G-8P7TF4SV17');
               <div class="progress__track"><div class="progress__fill" id="pctFill"></div></div>
             </div>
 
-            <div class="sec sec--first"><span class="sec__n">1</span><span class="sec__t">Реквізити контрагента</span></div>
-
             <div class="field">
               <label>Тип контрагента <span class="req">*</span></label>
               <div class="seg" role="group" aria-label="Тип контрагента" id="entitySeg">
@@ -466,8 +445,6 @@ gtag('config', 'G-8P7TF4SV17');
               </div>
             </div>
 
-            <div class="sec"><span class="sec__n">2</span><span class="sec__t">Контактна особа</span></div>
-
             <div class="form-row">
               <div class="field" data-field="person">
                 <label for="f_person">Контактна особа <span class="req">*</span></label>
@@ -490,8 +467,6 @@ gtag('config', 'G-8P7TF4SV17');
               <div class="err" data-err="email"></div>
             </div>
 
-            <div class="sec"><span class="sec__n">3</span><span class="sec__t">Локація</span></div>
-
             <div class="form-row">
               <div class="field" data-field="region">
                 <label for="f_region">Область <span class="req">*</span></label>
@@ -505,7 +480,7 @@ gtag('config', 'G-8P7TF4SV17');
                 <div class="err" data-err="region"></div>
               </div>
               <div class="field" data-field="settlement">
-                <label for="f_settlement">Населений пункт <span class="req">*</span> <span class="opt" data-settlement-hint>— спершу оберіть область</span></label>
+                <label for="f_settlement">Населений пункт <span class="req">*</span></label>
                 <div class="combo" id="settlementCombo">
                   <div class="combo__field">
                     <input id="f_settlement" class="control" name="settlement" placeholder="Спершу оберіть область" autocomplete="off" disabled role="combobox" aria-expanded="false" aria-autocomplete="list" />
@@ -516,8 +491,6 @@ gtag('config', 'G-8P7TF4SV17');
                 <div class="err" data-err="settlement"></div>
               </div>
             </div>
-
-            <div class="sec"><span class="sec__n">4</span><span class="sec__t">Профіль співпраці</span></div>
 
             <div class="form-row">
               <div class="field" data-field="profile">
@@ -557,12 +530,6 @@ gtag('config', 'G-8P7TF4SV17');
               <label>Залиште порожнім<input tabindex="-1" autocomplete="off" name="company_url" /></label>
             </div>
 
-            <div class="consent" id="consentWrap">
-              <input id="consent" type="checkbox" required aria-required="true" />
-              <label for="consent" class="checkbox" aria-hidden="true" data-ic="check"></label>
-              <label for="consent" class="txt">Погоджуюся на обробку персональних даних та з <a href="#" onclick="return false">умовами співпраці</a> React.</label>
-            </div>
-
             <div class="form-foot">
               <button class="btn btn--solid btn--lg" type="submit" id="submitBtn">
                 <span class="btn-label">Стати партнером</span> <span class="arr" data-arrow></span>
@@ -598,7 +565,7 @@ gtag('config', 'G-8P7TF4SV17');
               </div>
               <div class="tl">
                 <div class="tl__rail"><div class="tl__dot tl__dot--todo"></div></div>
-                <div class="tl__body"><div class="tl__t">Доступ до кабінету</div><div class="tl__d">Логін надійде на вашу Google-пошту</div></div>
+                <div class="tl__body"><div class="tl__t">Доступ до прайсу</div><div class="tl__d">Менеджер створить робочу групу в Telegram і надасть посилання на прайс</div></div>
               </div>
             </div>
             <div class="success__next">
@@ -821,15 +788,14 @@ function requiredKeys() {
 }
 function updateProgress() {
   const keys = requiredKeys();
-  const done = keys.filter(k => !validate(k)).length + (document.getElementById('consent').checked ? 1 : 0);
-  const pct = Math.round(done / (keys.length + 1) * 100);
+  const done = keys.filter(k => !validate(k)).length;
+  const pct = Math.round(done / keys.length * 100);
   const fill = document.getElementById('pctFill'), lbl = document.getElementById('pctLabel');
   if (fill) fill.style.width = pct + '%';
   if (lbl) lbl.textContent = 'Заповнено ' + pct + '%';
 }
 form.addEventListener('input', updateProgress);
 form.addEventListener('change', updateProgress);
-document.getElementById('consent').addEventListener('change', updateProgress);
 
 applyEntity();
 
@@ -980,7 +946,6 @@ function fieldError(name, msg) {
 }
 function clearErrors() {
   form.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
-  document.getElementById('consentWrap').classList.remove('invalid');
   banner.classList.remove('show');
 }
 
@@ -992,15 +957,13 @@ form.addEventListener('submit', async (e) => {
   if (form.querySelector('[name="company_url"]').value.trim()) { showSuccess(); return; }
 
   const v = (n) => { const el = form.querySelector(`[name="${n}"]`); return el ? el.value.trim() : ''; };
-  const consent = document.getElementById('consent').checked;
 
   // Валідація — ті самі правила validate(), що й у прогрес-барі.
   let firstBad = null;
   requiredKeys().forEach(k => { const msg = validate(k); if (msg) { fieldError(k, msg); if (!firstBad) firstBad = k; } });
-  if (!consent) { document.getElementById('consentWrap').classList.add('invalid'); if (!firstBad) firstBad = 'consent'; }
   updateProgress();
   if (firstBad) {
-    const el = firstBad === 'consent' ? document.getElementById('consent') : form.querySelector(`[name="${firstBad}"]`);
+    const el = form.querySelector(`[name="${firstBad}"]`);
     if (el && el.focus) el.focus();
     return;
   }
