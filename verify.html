@@ -819,6 +819,10 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
+  // Номер-референс заявки генеруємо ДО відправки, щоб той самий номер пішов
+  // у Planfix (коментар) і показався користувачу на екрані успіху.
+  const ticket = randTicket();
+
   // payload → бекенд (мапа полів дизайну на наш dealer_signup)
   const payload = {
     org_type: entity,
@@ -831,6 +835,7 @@ form.addEventListener('submit', async (e) => {
     field: form.querySelector('[name="profile"]').value,
     volume: form.querySelector('[name="volume"]').value,
     comment: v('note'),
+    ref: ticket,
   };
 
   submitBtn.disabled = true;
@@ -844,7 +849,7 @@ form.addEventListener('submit', async (e) => {
     });
     const out = await res.json().catch(() => ({}));
     if (res.ok && out.ok) {
-      showSuccess();
+      showSuccess(ticket);
       try { gtag('event', 'dealer_signup'); } catch (_) {}
     } else if (res.status === 429) {
       banner.textContent = 'Забагато спроб. Спробуйте трохи пізніше.';
@@ -868,8 +873,8 @@ function randTicket() {
   for (let i = 0; i < 6; i++) n += Math.floor(Math.random() * 10);
   return 'RC-' + n;
 }
-function showSuccess() {
-  document.getElementById('ticketNo').textContent = randTicket();
+function showSuccess(ticket) {
+  document.getElementById('ticketNo').textContent = ticket || randTicket();
   form.style.display = 'none';
   successView.classList.add('show');
   setTimeout(() => document.getElementById('successTitle').focus(), 40);
