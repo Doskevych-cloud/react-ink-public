@@ -206,6 +206,8 @@ gtag('config', 'G-8P7TF4SV17');
   .combo__opt.is-chosen { font-weight: 600; }
   .combo__tick { color: var(--accent-deep); display: flex; }
   .combo__empty { padding: 12px; font-size: 14px; color: var(--ink-3); text-align: center; }
+  .combo .control:disabled { opacity: .55; cursor: not-allowed; background: var(--paper); }
+  .combo__opt .combo__rgn { color: var(--ink-3); font-size: 13px; }
 
   .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: var(--paper); border: 1px solid var(--line-2); border-radius: 10px; padding: 5px; }
   .seg button {
@@ -450,6 +452,18 @@ gtag('config', 'G-8P7TF4SV17');
                 </div>
                 <div class="err" data-err="region"></div>
               </div>
+            </div>
+
+            <div class="field" data-field="settlement">
+              <label for="f_settlement">Населений пункт <span class="opt" data-settlement-hint>— спершу оберіть область</span></label>
+              <div class="combo" id="settlementCombo">
+                <div class="combo__field">
+                  <input id="f_settlement" class="control" name="settlement" placeholder="Спершу оберіть область" autocomplete="off" disabled role="combobox" aria-expanded="false" aria-autocomplete="list" />
+                  <span class="combo__chev" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg></span>
+                </div>
+                <ul class="combo__list" role="listbox" hidden></ul>
+              </div>
+              <div class="err" data-err="settlement"></div>
             </div>
 
             <div class="form-row">
@@ -709,6 +723,90 @@ document.getElementById('entitySeg').addEventListener('click', e => {
 });
 applyEntity();
 
+// ── Населений пункт — combobox через Nova Poshta (getSettlements по області) ──
+// Ref-и областей NP стабільні й публічні (Address.getSettlementAreas). «м. Київ»
+// у NP живе під областю «Київська», тож мапимо на той самий ref.
+const NP_AREA_REF = {
+  'Вінницька':'dcaad5a7-4b33-11e4-ab6d-005056801329','Волинська':'dcaad676-4b33-11e4-ab6d-005056801329',
+  'Дніпропетровська':'dcaad735-4b33-11e4-ab6d-005056801329','Донецька':'dcaad81c-4b33-11e4-ab6d-005056801329',
+  'Житомирська':'dcaad8fb-4b33-11e4-ab6d-005056801329','Закарпатська':'dcaad993-4b33-11e4-ab6d-005056801329',
+  'Запорізька':'dcaada26-4b33-11e4-ab6d-005056801329','Івано-Франківська':'dcaadac6-4b33-11e4-ab6d-005056801329',
+  'Київська':'dcaadb64-4b33-11e4-ab6d-005056801329','м. Київ':'dcaadb64-4b33-11e4-ab6d-005056801329',
+  'Кіровоградська':'dcaadbf9-4b33-11e4-ab6d-005056801329','Луганська':'dcaadc91-4b33-11e4-ab6d-005056801329',
+  'Львівська':'dcaadd3a-4b33-11e4-ab6d-005056801329','Миколаївська':'dcaaddd7-4b33-11e4-ab6d-005056801329',
+  'Одеська':'dcaade6d-4b33-11e4-ab6d-005056801329','Полтавська':'dcaadf02-4b33-11e4-ab6d-005056801329',
+  'Рівненська':'dcaadfa0-4b33-11e4-ab6d-005056801329','Сумська':'dcaae036-4b33-11e4-ab6d-005056801329',
+  'Тернопільська':'dcaae303-4b33-11e4-ab6d-005056801329','Харківська':'dcaae3a1-4b33-11e4-ab6d-005056801329',
+  'Херсонська':'dcaae44b-4b33-11e4-ab6d-005056801329','Хмельницька':'dcaae4e5-4b33-11e4-ab6d-005056801329',
+  'Черкаська':'dcaae57c-4b33-11e4-ab6d-005056801329','Чернівецька':'dcaae60e-4b33-11e4-ab6d-005056801329',
+  'Чернігівська':'dcaae6a8-4b33-11e4-ab6d-005056801329',
+};
+const settlementCombo = (function initSettlementCombo() {
+  const box = document.getElementById('settlementCombo');
+  const input = document.getElementById('f_settlement');
+  const list = box.querySelector('.combo__list');
+  const hint = document.querySelector('[data-settlement-hint]');
+  const TYPE = { 'місто':'м.', 'село':'с.', 'селище міського типу':'смт', 'селище':'с-ще', 'місто-курорт':'м.' };
+  let open = false, active = -1, current = [], areaRef = '', lastName = '', seq = 0, timer = null;
+
+  function fmt(row) {
+    const t = TYPE[row.SettlementTypeDescription] || '';
+    const rgn = row.RegionsDescription ? `${row.RegionsDescription} р-н` : '';
+    const value = `${t ? t + ' ' : ''}${row.Description}${rgn ? `, ${rgn}` : ''}`;
+    const html  = `${t ? t + ' ' : ''}${row.Description}${rgn ? ` <span class="combo__rgn">${rgn}</span>` : ''}`;
+    return { value, html };
+  }
+  function openMsg(msg) { open = true; list.hidden = false; input.setAttribute('aria-expanded','true'); list.innerHTML = `<li class="combo__empty">${msg}</li>`; }
+  function closeList() { open = false; list.hidden = true; input.setAttribute('aria-expanded','false'); active = -1; }
+  function render() {
+    if (!current.length) { openMsg('Нічого не знайдено'); return; }
+    open = true; list.hidden = false; input.setAttribute('aria-expanded','true');
+    list.innerHTML = current.map((o, i) => `<li class="combo__opt${i === active ? ' is-active' : ''}" role="option" data-i="${i}">${o.html}</li>`).join('');
+  }
+  function choose(o) { input.value = o.value; closeList(); }
+  async function search(q) {
+    if (!areaRef) { openMsg('Спершу оберіть область'); return; }
+    if (q.length < 2) { current = []; openMsg('Введіть мінімум 2 літери'); return; }
+    const mySeq = ++seq;
+    openMsg('Шукаю…');
+    try {
+      const res = await fetch('https://api.novaposhta.ua/v2.0/json/', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ apiKey: '', modelName: 'Address', calledMethod: 'getSettlements',
+          methodProperties: { AreaRef: areaRef, FindByString: q, Limit: '40', Page: '1' } }),
+      });
+      const j = await res.json();
+      if (mySeq !== seq) return; // прийшла відповідь на застарілий запит
+      const seen = new Set();
+      current = (j.data || []).map(fmt).filter(o => { if (seen.has(o.value)) return false; seen.add(o.value); return true; });
+      active = 0; render();
+    } catch (_) {
+      if (mySeq === seq) { current = []; openMsg('Nova Poshta недоступна — введіть вручну'); }
+    }
+  }
+  // Викликається з combo області при зміні вибору.
+  function setOblast(name) {
+    name = (name || '').trim();
+    if (name === lastName) return;
+    lastName = name;
+    areaRef = NP_AREA_REF[name] || '';
+    input.value = ''; current = []; active = -1; closeList();
+    if (areaRef) { input.disabled = false; input.placeholder = 'Почніть вводити назву'; if (hint) hint.textContent = '— необовʼязково'; }
+    else { input.disabled = true; input.placeholder = 'Спершу оберіть область'; if (hint) hint.textContent = '— спершу оберіть область'; }
+  }
+  input.addEventListener('focus', () => { if (input.disabled) return; const q = input.value.trim(); if (current.length) render(); else search(q); });
+  input.addEventListener('input', () => { active = 0; clearTimeout(timer); const q = input.value.trim(); timer = setTimeout(() => search(q), 250); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); active = Math.min(active + 1, current.length - 1); render(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
+    else if (e.key === 'Enter') { if (open && current[active]) { e.preventDefault(); choose(current[active]); } }
+    else if (e.key === 'Escape') { closeList(); }
+  });
+  list.addEventListener('mousedown', (e) => { const li = e.target.closest('.combo__opt'); if (li) { e.preventDefault(); choose(current[+li.dataset.i]); } });
+  document.addEventListener('mousedown', (e) => { if (!box.contains(e.target)) closeList(); });
+  return { setOblast };
+})();
+
 // ── Область — combobox з автодоповненням ──
 const OBLASTS = ['Вінницька','Волинська','Дніпропетровська','Донецька','Житомирська','Закарпатська','Запорізька','Івано-Франківська','Київська','м. Київ','Кіровоградська','Луганська','Львівська','Миколаївська','Одеська','Полтавська','Рівненська','Сумська','Тернопільська','Харківська','Херсонська','Хмельницька','Черкаська','Чернівецька','Чернігівська'];
 (function initRegionCombo() {
@@ -729,9 +827,9 @@ const OBLASTS = ['Вінницька','Волинська','Дніпропетр
   }
   function openList() { open = true; list.hidden = false; input.setAttribute('aria-expanded', 'true'); render(); }
   function closeList() { open = false; list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
-  function choose(o) { input.value = o; closeList(); }
+  function choose(o) { input.value = o; closeList(); settlementCombo.setOblast(o); }
   input.addEventListener('focus', openList);
-  input.addEventListener('input', () => { active = 0; openList(); });
+  input.addEventListener('input', () => { active = 0; openList(); settlementCombo.setOblast(input.value.trim()); });
   input.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); if (!open) openList(); active = Math.min(active + 1, current.length - 1); render(); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); active = Math.max(active - 1, 0); render(); }
@@ -832,6 +930,7 @@ form.addEventListener('submit', async (e) => {
     phone: '+38' + phoneRaw.replace(/\D/g, ''),
     email,
     city: v('region'),
+    settlement: v('settlement'),
     field: form.querySelector('[name="profile"]').value,
     volume: form.querySelector('[name="volume"]').value,
     comment: v('note'),
@@ -891,6 +990,7 @@ document.getElementById('resetForm').addEventListener('click', () => {
   entity = 'ТОВ';
   document.querySelectorAll('#entitySeg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.val === 'ТОВ')));
   applyEntity();
+  settlementCombo.setOblast('');
   clearErrors();
   successView.classList.remove('show');
   form.style.display = '';
