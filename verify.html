@@ -729,6 +729,9 @@ const successView = document.getElementById('successView');
 const banner = document.getElementById('formBanner');
 const submitBtn = document.getElementById('submitBtn');
 const btnLabel = submitBtn.querySelector('.btn-label');
+// Набір «торкнутих» полів — лише для них показуємо помилку наживо.
+// Оголошуємо рано: applyEntity() (нижче) кличе fieldCheck ще на завантаженні.
+const touchedFields = new Set();
 
 // segmented control (тип контрагента)
 let entity = 'ТОВ';
@@ -756,6 +759,7 @@ function applyEntity() {
     if (edrpou) edrpou.placeholder = isFop ? '0000000000' : '00000000';
   }
   if (typeof updateProgress === 'function') updateProgress();
+  if (!isFiz && typeof fieldCheck === 'function') { fieldCheck('company', false); fieldCheck('edrpou', false); }
 }
 document.getElementById('entitySeg').addEventListener('click', e => {
   const b = e.target.closest('button[data-val]');
@@ -839,7 +843,7 @@ const settlementCombo = (function initSettlementCombo() {
     open = true; list.hidden = false; input.setAttribute('aria-expanded','true');
     list.innerHTML = current.map((o, i) => `<li class="combo__opt${i === active ? ' is-active' : ''}" role="option" data-i="${i}">${o.html}</li>`).join('');
   }
-  function choose(o) { input.value = o.value; closeList(); if (typeof updateProgress === 'function') updateProgress(); }
+  function choose(o) { input.value = o.value; closeList(); if (typeof updateProgress === 'function') updateProgress(); if (typeof fieldCheck === 'function') fieldCheck('settlement', true); }
   async function search(q) {
     if (!areaRef) { openMsg('Спершу оберіть область'); return; }
     if (q.length < 2) { current = []; openMsg('Введіть мінімум 2 літери'); return; }
@@ -904,7 +908,7 @@ const OBLASTS = ['Вінницька','Волинська','Дніпропетр
   }
   function openList() { open = true; list.hidden = false; input.setAttribute('aria-expanded', 'true'); render(); }
   function closeList() { open = false; list.hidden = true; input.setAttribute('aria-expanded', 'false'); active = -1; }
-  function choose(o) { input.value = o; closeList(); settlementCombo.setOblast(o); if (typeof updateProgress === 'function') updateProgress(); }
+  function choose(o) { input.value = o; closeList(); settlementCombo.setOblast(o); if (typeof updateProgress === 'function') updateProgress(); if (typeof fieldCheck === 'function') fieldCheck('region', true); }
   input.addEventListener('focus', openList);
   input.addEventListener('input', () => { active = 0; openList(); settlementCombo.setOblast(input.value.trim()); });
   input.addEventListener('keydown', (e) => {
@@ -946,8 +950,31 @@ function fieldError(name, msg) {
 }
 function clearErrors() {
   form.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
+  touchedFields.clear();
   banner.classList.remove('show');
 }
+
+// ── Валідація «на льоту» ──
+// Поле перевіряємо щойно його торкнулись (blur по полю, вибір у select/комбо),
+// а далі — на кожен ввід, щоб помилка зникала одразу як її виправили
+// (і не зʼявлялась передчасно, поки поле ще не чіпали).
+function fieldCheck(name, markTouched) {
+  if (markTouched) touchedFields.add(name);
+  if (!touchedFields.has(name)) return;
+  fieldError(name, validate(name));
+}
+form.addEventListener('focusout', (e) => {
+  const wrap = e.target.closest('[data-field]');
+  if (wrap && requiredKeys().includes(wrap.dataset.field)) fieldCheck(wrap.dataset.field, true);
+});
+form.addEventListener('input', (e) => {
+  const wrap = e.target.closest('[data-field]');
+  if (wrap) fieldCheck(wrap.dataset.field, false);
+});
+form.addEventListener('change', (e) => {
+  const wrap = e.target.closest('[data-field]');
+  if (wrap) fieldCheck(wrap.dataset.field, true);
+});
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -960,7 +987,7 @@ form.addEventListener('submit', async (e) => {
 
   // Валідація — ті самі правила validate(), що й у прогрес-барі.
   let firstBad = null;
-  requiredKeys().forEach(k => { const msg = validate(k); if (msg) { fieldError(k, msg); if (!firstBad) firstBad = k; } });
+  requiredKeys().forEach(k => { const msg = validate(k); touchedFields.add(k); fieldError(k, msg); if (msg && !firstBad) firstBad = k; });
   updateProgress();
   if (firstBad) {
     const el = form.querySelector(`[name="${firstBad}"]`);
