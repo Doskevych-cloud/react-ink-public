@@ -343,8 +343,7 @@ gtag('config', 'G-8P7TF4SV17');
     </a>
     <nav class="topnav">
       <a class="topnav__link" href="#verify">Як це працює</a>
-      <a class="topnav__link" href="#verify">Верифікація</a>
-      <button class="btn btn--ghost" type="button" data-open-login>Увійти</button>
+      <a class="btn btn--ghost" href="#verify">Верифікація</a>
     </nav>
   </div>
 </header>
@@ -359,7 +358,7 @@ gtag('config', 'G-8P7TF4SV17');
         <p class="hero__sub">Доступ до гуртових цін, залишків та швидкої дистрибуції сонячного обладнання. Підтвердження — протягом робочого дня.</p>
         <div class="hero__cta">
           <a class="btn btn--solid btn--lg" href="#verify">Подати заявку <span class="arr" data-arrow></span></a>
-          <span class="hero__note">Уже маєте акаунт? <button type="button" class="linkbtn" data-open-login>Увійти</button></span>
+          <span class="hero__note">Уже партнер? Відкрийте прайс за посиланням від менеджера.</span>
         </div>
       </div>
     </div>
@@ -462,7 +461,7 @@ gtag('config', 'G-8P7TF4SV17');
             </div>
 
             <div class="field" data-field="email">
-              <label for="f_email">E-mail <span class="opt">— Google-пошта, для входу в кабінет</span> <span class="req">*</span></label>
+              <label for="f_email">E-mail <span class="opt">— для звʼязку</span> <span class="req">*</span></label>
               <input id="f_email" class="control" type="email" name="email" placeholder="name@company.ua" required aria-required="true" />
               <div class="err" data-err="email"></div>
             </div>
@@ -595,7 +594,6 @@ gtag('config', 'G-8P7TF4SV17');
           <h4>Дилерам</h4>
           <a href="#verify">Верифікація</a>
           <a href="#verify">Як це працює</a>
-          <button class="linkbtn" type="button" data-open-login style="font-weight:400;color:var(--ink-2);font-size:14px;margin-bottom:9px;display:block">Увійти в кабінет</button>
         </div>
         <div class="foot__col">
           <h4>Адреси</h4>
@@ -618,67 +616,12 @@ gtag('config', 'G-8P7TF4SV17');
   </div>
 </footer>
 
-<!-- ============ LOGIN MODAL (phase 1 — honest "coming soon") ============ -->
-<div class="modal" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
-  <div class="modal__card">
-    <button class="modal__x" type="button" id="loginClose" aria-label="Закрити">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
-    </button>
-    <div class="modal__head">
-      <div class="modal__ic" data-ic="key"></div>
-      <h3 id="loginTitle">Вхід для дилерів</h3>
-      <p>Увійдіть через Google з поштою, яку вказували в заявці на верифікацію.</p>
-    </div>
-    <div id="gsiWrap" style="display:flex;justify-content:center;margin:0 0 16px"><div id="gsiBtn"></div></div>
-    <p id="gsiErr" style="display:none;font-size:13.5px;color:var(--danger);background:rgba(194,69,47,.07);border:1px solid rgba(194,69,47,.18);border-radius:8px;padding:11px 14px;line-height:1.5;margin:0 0 14px"></p>
-    <div class="modal__note">
-      Ще не партнер? <a href="#verify" id="goVerify">Подайте заявку на верифікацію</a> — після підтвердження вхід запрацює з вашою поштою.
-    </div>
-  </div>
-</div>
-
-<script src="https://accounts.google.com/gsi/client" async defer onload="renderGsi()"></script>
 <script>
 // ============================================================
 // КОНФІГ
 // ============================================================
 const API = 'https://react-pricelist.doskevich.workers.dev';
 const PRICE_API = 'https://price-api.doskevich.workers.dev';
-const GOOGLE_CLIENT_ID = '970560011376-htrf3g3s3at0id7iegomi6q9jshgj7ro.apps.googleusercontent.com';
-
-// ── Google-вхід дилера: верифікована пошта → токен кабінету ──
-let gsiInited = false;
-function renderGsi() {
-  const el = document.getElementById('gsiBtn');
-  if (!el || !window.google || !google.accounts) return;
-  if (!gsiInited) {
-    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCred });
-    gsiInited = true;
-  }
-  el.innerHTML = '';
-  google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: 'uk', width: 280 });
-}
-function gsiError(msg) {
-  const e = document.getElementById('gsiErr');
-  e.textContent = msg; e.style.display = 'block';
-}
-async function onGoogleCred(resp) {
-  try {
-    const r = await fetch(`${PRICE_API}/?action=dealer_auth_google`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credential: resp.credential }),
-    });
-    const out = await r.json().catch(() => ({}));
-    if (r.ok && out.ok && out.token) {
-      try { localStorage.setItem('dealer_token', out.token); } catch (_) {}
-      location.href = '/cabinet';
-    } else if (r.status === 403) {
-      gsiError('Цю Google-пошту не підключено до кабінету. Подайте заявку — і менеджер відкриє доступ.');
-    } else {
-      gsiError('Не вдалося увійти. Спробуйте ще раз.');
-    }
-  } catch (_) { gsiError('Помилка мережі. Спробуйте ще раз.'); }
-}
 
 // ---- inline SVG icons ----
 const ICONS = {
@@ -697,29 +640,6 @@ const topbar = document.getElementById('topbar');
 const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 8);
 window.addEventListener('scroll', onScroll, { passive: true });
 onScroll();
-
-// ============================================================
-// LOGIN MODAL (phase 1 — honest "coming soon")
-// ============================================================
-const loginModal = document.getElementById('loginModal');
-let loginTrigger = null;
-function openLogin(e) {
-  loginTrigger = (e && e.currentTarget) || document.activeElement;
-  loginModal.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  renderGsi(); // GIS міг завантажитись поки модалка була закрита
-  setTimeout(() => document.getElementById('loginClose').focus(), 40);
-}
-function closeLogin() {
-  loginModal.classList.remove('open');
-  document.body.style.overflow = '';
-  if (loginTrigger && loginTrigger.focus) loginTrigger.focus();
-}
-document.querySelectorAll('[data-open-login]').forEach(b => b.addEventListener('click', openLogin));
-document.getElementById('loginClose').addEventListener('click', closeLogin);
-loginModal.addEventListener('mousedown', e => { if (e.target === loginModal) closeLogin(); });
-document.getElementById('goVerify').addEventListener('click', closeLogin);
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && loginModal.classList.contains('open')) closeLogin(); });
 
 // ============================================================
 // FORM

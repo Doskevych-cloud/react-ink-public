@@ -759,10 +759,8 @@ footer {
     <div class="gate__ic">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.5 12.5 8-8M16 3l3 3M14 6l2 2"/></svg>
     </div>
-    <h1 id="denyTitle">Вхід до кабінету</h1>
-    <p id="denyText">Увійдіть через Google з поштою, яку вказували в заявці, або відкрийте кабінет за персональним посиланням від менеджера.</p>
-    <div id="gsiWrap" style="display:flex;justify-content:center;margin:0 0 16px"><div id="gsiBtn"></div></div>
-    <p id="gsiErr" style="display:none;font-size:13.5px;color:#C2452F;background:rgba(194,69,47,.07);border:1px solid rgba(194,69,47,.18);border-radius:8px;padding:11px 14px;line-height:1.5;margin:0 0 16px"></p>
+    <h1 id="denyTitle">Прайс за посиланням</h1>
+    <p id="denyText">Відкрийте прайс за посиланням, яке надіслав менеджер. Ще не партнер — подайте заявку на верифікацію.</p>
     <a class="btn" href="/verify">Подати заявку</a>
   </div>
 </div>
@@ -914,19 +912,18 @@ footer {
 
 </div><!-- /cabView -->
 
-<script src="https://accounts.google.com/gsi/client" async defer onload="renderGsi()"></script>
 <script>
 // ============================================================
 // КОНФІГ
 // ============================================================
 const API = 'https://react-pricelist.doskevich.workers.dev';      // fx_nbu
 const PRICE_API = 'https://price-api.doskevich.workers.dev';     // dealer_*
-const GOOGLE_CLIENT_ID = '970560011376-htrf3g3s3at0id7iegomi6q9jshgj7ro.apps.googleusercontent.com';
 const CODE2NAME = { '840': 'USD', '978': 'EUR', '980': 'UAH' };
 
 let DATA = [];
 let DEALER = null;
-let TOKEN = '';
+let TOKEN = '';    // легасі персональне посилання (?token=)
+let KEY = '';      // нове посилання рівня (?k=)
 
 // ============================================================
 // UTILS
@@ -1056,7 +1053,7 @@ function renderCatalog() {
 // DATA LOAD
 // ============================================================
 async function loadAll() {
-  const res = await fetch(`${PRICE_API}/?action=dealer_price_list&token=${encodeURIComponent(TOKEN)}`);
+  const res = await fetch(`${PRICE_API}/?action=dealer_price_list&${KEY ? 'k=' + encodeURIComponent(KEY) : 'token=' + encodeURIComponent(TOKEN)}`);
   const data = await res.json().catch(() => ({}));
   if (!res.ok || !data.ok) throw new Error((data && data.error) || ('HTTP ' + res.status));
 
@@ -1175,60 +1172,35 @@ function deny(title, text) {
   if (title) document.getElementById('denyTitle').textContent = title;
   if (text) document.getElementById('denyText').textContent = text;
   showView('denyView');
-  renderGsi();
 }
-function resolveToken() {
+function clearEntry() {
+  try { localStorage.removeItem('dealer_token'); localStorage.removeItem('dealer_key'); } catch (_) {}
+}
+// Вхід: нове посилання рівня (?k=slug) або легасі персональне (?token=).
+// Обидва запамʼятовуємо в localStorage, щоб дилер міг вертатись без параметра.
+function resolveEntry() {
   const url = new URL(location.href);
-  let t = url.searchParams.get('token');
-  if (t) {
-    try { localStorage.setItem('dealer_token', t); } catch (_) {}
-    url.searchParams.delete('token');
-    history.replaceState(null, '', url.pathname + (url.search || '') + url.hash);
-    return t;
-  }
-  try { return localStorage.getItem('dealer_token') || ''; } catch (_) { return ''; }
-}
-
-let gsiInited = false;
-function renderGsi() {
-  const el = document.getElementById('gsiBtn');
-  if (!el || !window.google || !google.accounts) return;
-  if (!gsiInited) {
-    google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: onGoogleCred });
-    gsiInited = true;
-  }
-  el.innerHTML = '';
-  google.accounts.id.renderButton(el, { theme: 'outline', size: 'large', text: 'signin_with', locale: 'uk', width: 280 });
-}
-function gsiError(msg) {
-  const e = document.getElementById('gsiErr');
-  e.textContent = msg; e.style.display = 'block';
-}
-async function onGoogleCred(resp) {
+  const k = url.searchParams.get('k');
+  const t = url.searchParams.get('token');
+  const strip = (name) => { url.searchParams.delete(name); history.replaceState(null, '', url.pathname + (url.search || '') + url.hash); };
+  if (k) { try { localStorage.setItem('dealer_key', k); localStorage.removeItem('dealer_token'); } catch (_) {} strip('k'); return { k }; }
+  if (t) { try { localStorage.setItem('dealer_token', t); localStorage.removeItem('dealer_key'); } catch (_) {} strip('token'); return { token: t }; }
   try {
-    const r = await fetch(`${PRICE_API}/?action=dealer_auth_google`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ credential: resp.credential }),
-    });
-    const out = await r.json().catch(() => ({}));
-    if (r.ok && out.ok && out.token) {
-      try { localStorage.setItem('dealer_token', out.token); } catch (_) {}
-      location.href = '/cabinet';
-    } else if (r.status === 403) {
-      gsiError('Цю Google-пошту не підключено до кабінету. Подайте заявку на верифікацію або зверніться до менеджера.');
-    } else {
-      gsiError('Не вдалося увійти. Спробуйте ще раз.');
-    }
-  } catch (_) { gsiError('Помилка мережі. Спробуйте ще раз.'); }
+    const sk = localStorage.getItem('dealer_key'); if (sk) return { k: sk };
+    const st = localStorage.getItem('dealer_token'); if (st) return { token: st };
+  } catch (_) {}
+  return {};
 }
 
 async function initCabinet() {
-  TOKEN = resolveToken();
-  if (!TOKEN) { deny(); return; }
+  const ent = resolveEntry();
+  KEY = ent.k || ''; TOKEN = ent.token || '';
+  if (!KEY && !TOKEN) { deny(); return; }
+  const qs = KEY ? 'k=' + encodeURIComponent(KEY) : 'token=' + encodeURIComponent(TOKEN);
   let me;
   try {
-    const r = await fetch(`${PRICE_API}/?action=dealer_me&token=${encodeURIComponent(TOKEN)}`);
-    if (r.status === 401) { try { localStorage.removeItem('dealer_token'); } catch (_) {} return deny(); }
+    const r = await fetch(`${PRICE_API}/?action=dealer_me&${qs}`);
+    if (r.status === 401) { clearEntry(); return deny(); }
     me = await r.json();
     if (!me.ok) return deny();
   } catch (_) { return deny('Помилка зʼєднання', 'Не вдалося завантажити кабінет. Спробуйте оновити сторінку.'); }
@@ -1236,7 +1208,6 @@ async function initCabinet() {
   DEALER = me.dealer;
   document.getElementById('dCompany').textContent = DEALER.company;
   const bits = [];
-  if (DEALER.discount_pct) bits.push(`<span class="disc">−${DEALER.discount_pct}%</span>`);
   if (DEALER.manager_name) bits.push(esc(DEALER.manager_name));
   document.getElementById('dMeta').innerHTML = bits.join(' · ');
 
@@ -1249,7 +1220,7 @@ async function initCabinet() {
   });
 }
 document.getElementById('logoutBtn').addEventListener('click', () => {
-  try { localStorage.removeItem('dealer_token'); } catch (_) {}
+  clearEntry();
   location.href = '/verify';
 });
 initCabinet();
@@ -1325,7 +1296,7 @@ function buildPdfDocDefinition() {
     },
     { text: `Оновлено · ${dateStr}`, style: 'dateLine', margin: [0, 0, 0, 4] },
     ...(DEALER ? [{
-      text: `Дилер · ${DEALER.company}${DEALER.discount_pct ? ` · знижка −${DEALER.discount_pct}% врахована в цінах` : ''}`,
+      text: 'Гуртовий прайс для партнерів React',
       style: 'dateLine', margin: [0, 0, 0, 14],
     }] : []),
   ];
