@@ -783,7 +783,6 @@ footer {
   <div class="print-title">Прайс-лист на обладнання</div>
 
   <div class="print-info">
-    <div class="row-line"><b>Офіс:</b> Одеса, вул. Велика Арнаутська, 15</div>
     <div class="row-line"><b>Склади:</b> Одеса, вул. Чигиринська, 21 · м. Вишневе, вул. Промислова, 10</div>
     <div class="row-line"><b>Контакти:</b> Олександра +380 63 325 61 10</div>
     <div class="row-line"><b>Курс:</b> USD/UAH <span id="printFxUsd">—</span> · EUR/UAH <span id="printFxEur">—</span></div>
@@ -852,13 +851,6 @@ footer {
     </div>
   </div>
   <div class="info-grid">
-    <div class="info-card">
-      <div class="k">Офіс · Одеса</div>
-      <div class="v">
-        <a class="v-text" href="#" target="_blank" rel="noopener">вул. Велика Арнаутська, 15</a>
-        <button class="copy-btn" data-copy="Одеса, вул. Велика Арнаутська, 15" aria-label="Копіювати"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
-      </div>
-    </div>
     <div class="info-card">
       <div class="k">Склад · Одеса</div>
       <div class="v">
@@ -1291,10 +1283,6 @@ function buildPdfDocDefinition() {
     },
     {
       columns: [
-        { stack: [
-          { text: 'ОФІС', style: 'metaLabel' },
-          { text: 'Одеса, вул. Велика Арнаутська, 15', style: 'metaValue' }
-        ]},
         { stack: [
           { text: 'СКЛАД · КИЇВ', style: 'metaLabel' },
           { text: 'м. Вишневе, вул. Промислова, 10', style: 'metaValue' }
