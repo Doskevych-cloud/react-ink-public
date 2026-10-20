@@ -777,7 +777,7 @@ footer {
 
   <div class="print-info">
     <div class="row-line"><b>Склади:</b> Одеса, вул. Чигиринська, 21 · м. Вишневе, вул. Промислова, 10</div>
-    <div class="row-line"><b>Контакти:</b> Олександра +380 63 325 61 10</div>
+    <div class="row-line"><b>Контакти:</b> Олександра +380 63 325 61 10 · Дарʼя +380 67 577 73 40</div>
     <div class="row-line"><b>Курс:</b> USD/UAH <span id="printFxUsd">—</span> · EUR/UAH <span id="printFxEur">—</span></div>
   </div>
 
@@ -1207,7 +1207,7 @@ function buildPdfDocDefinition() {
   const fmtNum = (v, dec) => {
     if (v == null || !isFinite(v)) return '—';
     if (dec) return v.toLocaleString('uk-UA', { minimumFractionDigits: dec, maximumFractionDigits: dec });
-    if (Math.abs(v) < 1) return v.toFixed(3).replace(/\.?0+$/, '');
+    if (Math.abs(v) < 1) return v.toFixed(3).replace(/\.?0+$/, '').replace('.', ',');
     return v.toLocaleString('uk-UA', { maximumFractionDigits: 0 });
   };
 
@@ -1221,8 +1221,10 @@ function buildPdfDocDefinition() {
           { text: 'ОЛЕКСАНДРА', style: 'metaLabel' },
           { text: '+380 63 325 61 10', style: 'metaValue' }
         ]},
-        { text: '' },
-        { text: '' },
+        { stack: [
+          { text: 'ДАРʼЯ', style: 'metaLabel' },
+          { text: '+380 67 577 73 40', style: 'metaValue' }
+        ]},
       ],
       margin: [0, 0, 0, 10],
     },
@@ -1254,7 +1256,7 @@ function buildPdfDocDefinition() {
     ]];
     const bhRows = new Set();  // індекси перших рядків брендових груп у body
     brandRows(c.items).forEach(({ it, head }) => {
-      const w = isW ? wattsFromSpec(it.spec) : null;
+      const w = isW ? (wattsFromSpec(it.name) || wattsFromSpec(it.spec)) : null;
       const itemCur = (it.no_vat && it.no_vat.currency_name) || (it.with_vat && it.with_vat.currency_name) || null;
       const cur = isW ? '$' : (itemCur ? curSym(itemCur) : (c.unit || '$'));
       const p1raw = it.no_vat && it.no_vat.price != null ? Number(it.no_vat.price) : null;
