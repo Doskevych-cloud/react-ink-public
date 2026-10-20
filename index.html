@@ -229,6 +229,19 @@ main { padding: 0; }
 .category { margin-top: 48px; scroll-margin-top: 160px; border-top: 1px solid var(--line); padding-top: 20px; }
 .category:first-child { margin-top: 24px; border-top: none; padding-top: 0; }
 .cat-head { padding: 0 4px 12px; margin-bottom: 0; }
+/* Підпис бренду над групою позицій категорії — тихий, мовою лейблів сторінки (mono · caps · --ink-3).
+   Стоїть над КОЖНОЮ групою, навіть коли бренд у категорії один; біля назви категорії бренду нема. */
+.brand-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 26px 4px 0;
+}
+.cat-head + .brand-head { padding-top: 4px; }
 .cat-head h2 {
   margin: 0;
   font-size: 20px;
@@ -372,6 +385,8 @@ footer {
   main { padding: 0 16px 48px; }
   .category { margin-top: 32px; scroll-margin-top: 140px; }
   .cat-head h2 { font-size: 17px; }
+  .brand-head { font-size: 10.5px; padding: 24px 0 0; }
+  .cat-head + .brand-head { padding-top: 2px; }
 
   .row-head { padding: 12px 32px; grid-template-columns: 1fr 96px; gap: 16px; }
   .row-head .head-p1, .row-head .head-p2, .row-head .head-ds { display: none; }
@@ -592,6 +607,22 @@ footer {
     margin: 0 !important;
   }
   .cat-head .cat-count { display: none !important; }
+
+  /* підпис бренду — тихий рядок на всю ширину таблиці, не відривається від першої позиції групи */
+  .brand-head {
+    padding: 0.8mm 2mm 0.8mm 11mm !important;  /* 11mm = колонка № (9mm) + відступ комірки */
+    border-left: 0.75pt solid #000 !important;
+    border-right: 0.75pt solid #000 !important;
+    border-top: 0.75pt solid #000 !important;
+    font-family: inherit !important;
+    font-size: 7.5pt !important;
+    font-weight: 400 !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.08em !important;
+    color: #555 !important;
+    page-break-after: avoid;
+    break-after: avoid;
+  }
 
   /* рядки товарів */
   .row {
@@ -867,6 +898,22 @@ const fmtPrice = (v, dec) => {
   return v.toLocaleString('uk-UA', { maximumFractionDigits: 0 }).replace(/\s/g, '\u202F');
 };
 const curSym = name => name === 'USD' ? '$' : (name === 'EUR' ? '€' : (name || '$'));
+// Позиції категорії групуються по бренду (рішення власника 20.10.2026): позиції без бренду — першими,
+// без підпису; далі бренди в порядку першої появи (ручний sort_order адмінки), усередині групи порядок
+// не міняється. head = підпис бренду перед першою позицією групи — над кожною групою, навіть
+// коли бренд у категорії один або в бренду одна позиція. Назви позицій не чіпаємо.
+function brandRows(items) {
+  const none = [], groups = new Map();
+  items.forEach(it => {
+    if (!it.brand) { none.push(it); return; }
+    const k = it.brand.toLowerCase();
+    if (!groups.has(k)) groups.set(k, { brand: it.brand, items: [] });
+    groups.get(k).items.push(it);
+  });
+  const rows = none.map(it => ({ it, head: null }));
+  groups.forEach(g => g.items.forEach((it, i) => rows.push({ it, head: i === 0 ? g.brand : null })));
+  return rows;
+}
 
 function showNotice(msg, isErr) {
   const el = document.getElementById('notice');
@@ -926,7 +973,13 @@ function renderCatalog() {
     sec.id = c.slug;
     sec.innerHTML = `<div class="cat-head"><h2>${esc(c.cat)}</h2></div>`;
 
-    c.items.forEach(it => {
+    brandRows(c.items).forEach(({ it, head }) => {
+      if (head) {
+        const bh = document.createElement('div');
+        bh.className = 'brand-head';
+        bh.textContent = head;
+        sec.appendChild(bh);
+      }
       const w = (c.unit === '$/Вт') ? wattsForItem(it) : null;
       const p1raw = it.no_vat && it.no_vat.price != null
         ? (w ? Number(it.no_vat.price) / w : Number(it.no_vat.price)) : null;
@@ -999,6 +1052,7 @@ async function loadAll() {
         spec: it.display_spec || '',
         stock: it.stock || 'в наявності',
         ds_url: it.datasheet_url || null,
+        brand: String(it.brand || '').trim() || null,
         no_vat: it.no_vat,
         with_vat: it.with_vat,
       })),
@@ -1173,7 +1227,8 @@ function buildPdfDocDefinition() {
       { text: 'З ПДВ', style: 'th', alignment: 'center' },
       { text: 'Наявність', style: 'th' },
     ]];
-    c.items.forEach(it => {
+    const bhRows = new Set();  // індекси перших рядків брендових груп у body
+    brandRows(c.items).forEach(({ it, head }) => {
       const w = isW ? wattsFromSpec(it.spec) : null;
       const itemCur = (it.no_vat && it.no_vat.currency_name) || (it.with_vat && it.with_vat.currency_name) || null;
       const cur = isW ? '$' : (itemCur ? curSym(itemCur) : (c.unit || '$'));
@@ -1183,7 +1238,7 @@ function buildPdfDocDefinition() {
       const p2 = p2raw != null ? (w ? p2raw / w : p2raw) : null;
       const p1s = p1 != null ? `${fmtNum(p1, c.dec)} ${cur}` : '—';
       const p2s = p2 != null ? `${fmtNum(p2, c.dec)} ${cur}` : '—';
-      body.push([
+      const row = [
         { stack: [
             { text: it.name, style: 'tdName' },
             ...(it.spec ? [{ text: it.spec, style: 'tdSub' }] : []),
@@ -1191,15 +1246,28 @@ function buildPdfDocDefinition() {
         { text: p1s, alignment: 'center', style: 'tdNum' },
         { text: p2s, alignment: 'center', style: 'tdNum' },
         { text: it.stock || '', style: 'tdStock' },
-      ]);
+      ];
+      // Підпис бренду — у першому рядку групи, над назвою: рядки не рвуться (dontBreakRows), тож
+      // підпис не лишається сам унизу сторінки. Інші комірки — з невидимим рядком того ж стилю,
+      // щоб ціни й наявність стояли на рівні назви.
+      if (head) {
+        bhRows.add(body.length);
+        row[0].stack.unshift({ text: head.toUpperCase(), style: 'brandHead', margin: [0, 0, 0, 3] });
+        for (let k = 1; k < row.length; k++) {
+          row[k] = { stack: [{ text: '\u00a0', style: 'brandHead', margin: [0, 0, 0, 3] }, row[k]] };
+        }
+      }
+      body.push(row);
     });
     content.push({
-      table: { headerRows: 1, widths: ['*', 70, 70, 80], body },
+      // dontBreakRows — рядок (з підписом бренду) не рветься між сторінками;
+      // keepWithHeaderRows — шапка таблиці не лишається внизу сторінки без жодної позиції.
+      table: { headerRows: 1, keepWithHeaderRows: 1, dontBreakRows: true, widths: ['*', 70, 70, 80], body },
       layout: {
         hLineWidth: (i, node) => (i === 0 || i === 1 || i === node.table.body.length) ? 0.6 : 0.3,
         vLineWidth: () => 0,
         hLineColor: () => '#d0d0cd',
-        paddingTop:    () => 6,
+        paddingTop:    i => (bhRows.has(i) && i > 1) ? 10 : 6,  // повітря перед новою брендовою групою
         paddingBottom: () => 6,
         paddingLeft:   () => 4,
         paddingRight:  () => 4,
@@ -1215,6 +1283,12 @@ function buildPdfDocDefinition() {
   return {
     pageSize: 'A4',
     pageMargins: [36, 32, 36, 40],
+    // Назва категорії не лишається сама внизу сторінки. Шапка таблиці + перший рядок — нерозривний
+    // блок (keepWithHeaderRows + dontBreakRows), але pdfmake не бачить, що такий блок переїхав на
+    // наступну сторінку (позиції пише в тимчасовий контекст), тож міряємо місце під самою назвою:
+    // назва + шапка + перший рядок з підписом бренду й двома рядками опису ≈ 95 pt.
+    pageBreakBefore: node => node.style === 'catHead' && !!node.startPosition
+      && (1 - node.startPosition.verticalRatio) * node.startPosition.pageInnerHeight < 100,
     content,
     footer: (currentPage, pageCount) => ({
       text: `${currentPage} / ${pageCount}`,
@@ -1228,6 +1302,7 @@ function buildPdfDocDefinition() {
       metaValue: { fontSize: 9 },
       dateLine:  { fontSize: 8, color: '#7a7a7a', characterSpacing: 1 },
       catHead:   { fontSize: 12, bold: true },
+      brandHead: { fontSize: 7, color: '#8a8a8a', characterSpacing: 1 },
       th:        { fontSize: 8, bold: true, color: '#6a6a6a', characterSpacing: 0.5 },
       tdName:    { fontSize: 9, bold: true },
       tdSub:     { fontSize: 8, color: '#7a7a7a', margin: [0, 1, 0, 0] },
