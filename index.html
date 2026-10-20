@@ -242,6 +242,29 @@ main { padding: 0; }
   padding: 26px 4px 0;
 }
 .cat-head + .brand-head { padding-top: 4px; }
+/* Широкий десктоп: бренд — перша колонка таблиці, лише на першому рядку групи (нижче порожньо).
+   Вужче 1100px колонка з'їдає назви (переносяться в 3–4 рядки) — там, на мобілці, у друці й PDF
+   лишається підпис над групою (.brand-head). */
+.row-brand {
+  display: none;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  line-height: 17px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  align-self: start;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.row-head .head-brand { display: none; }
+@media screen and (min-width: 1100px) {
+  .row-head-wrap .row-head, main .row { grid-template-columns: 104px minmax(0, 1fr) 140px 140px 130px 110px; }
+  .row-brand, .row-head .head-brand { display: block; }
+  .brand-head { display: none; }
+  .row.grp-start { margin-top: 14px; }
+}
 .cat-head h2 {
   margin: 0;
   font-size: 20px;
@@ -833,6 +856,7 @@ footer {
 
 <div class="row-head-wrap">
   <div class="row-head">
+    <div class="head-brand">Бренд</div>
     <div>Назва</div>
     <div class="num-col head-p1">Ціна без ПДВ</div>
     <div class="num-col head-p2">Ціна з ПДВ</div>
@@ -973,7 +997,7 @@ function renderCatalog() {
     sec.id = c.slug;
     sec.innerHTML = `<div class="cat-head"><h2>${esc(c.cat)}</h2></div>`;
 
-    brandRows(c.items).forEach(({ it, head }) => {
+    brandRows(c.items).forEach(({ it, head }, ri) => {
       if (head) {
         const bh = document.createElement('div');
         bh.className = 'brand-head';
@@ -1001,8 +1025,9 @@ function renderCatalog() {
         : '<span class="ds-link none">—</span>';
 
       const row = document.createElement('div');
-      row.className = 'row';
+      row.className = head && ri > 0 ? 'row grp-start' : 'row';
       row.innerHTML = `
+        <div class="row-brand">${head ? esc(head) : ''}</div>
         <div class="prod-name">
           <span>${esc(it.name)}</span>
           ${it.spec ? `<span class="prod-sub">${esc(it.spec)}</span>` : ''}
