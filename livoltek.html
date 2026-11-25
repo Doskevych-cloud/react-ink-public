@@ -212,8 +212,25 @@ gtag('config', 'G-8P7TF4SV17');
 
   /* ---------- Комплект ---------- */
   .kit__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: center; }
-  .kit__img { border-radius: var(--r-xl); overflow: hidden; aspect-ratio: 1040 / 1000; background: #55606E; box-shadow: var(--shadow-md); }
-  .kit__img img { width: 100%; height: 100%; object-fit: cover; }
+  .kit__img { position: relative; border-radius: var(--r-xl); overflow: hidden; aspect-ratio: 1 / 1; background: #5B6573 url('assets/livoltek/kit-explode-end.jpg') center / cover no-repeat; box-shadow: var(--shadow-md); }
+  .kit__img video { display: none; width: 100%; height: 100%; object-fit: cover; }
+  .js .kit__img video { display: block; }
+  .js .kit__img.is-static video { display: none; }
+  /* підписи деталей — виноски з лініями; зʼявляються, коли система розібралась */
+  .kit__lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .kit__lines line { stroke: rgba(255,255,255,.8); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .kit__lines circle { fill: #fff; }
+  .kit__tag {
+    position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%);
+    font-size: 13.5px; font-weight: 600; letter-spacing: -.005em; line-height: 1; white-space: nowrap; color: #fff;
+    background: rgba(35,38,45,.94); padding: 9px 13px; border-radius: 8px; pointer-events: none;
+  }
+  .js .kit__tag { opacity: 0; transition: opacity .45s var(--ease); }
+  .js .kit__lines line { stroke-dashoffset: 1; transition: stroke-dashoffset .5s var(--ease) .15s; }
+  .js .kit__lines circle { opacity: 0; transition: opacity .3s var(--ease) .55s; }
+  .js .kit__img.is-done .kit__tag { opacity: 1; }
+  .js .kit__img.is-done .kit__lines line { stroke-dashoffset: 0; }
+  .js .kit__img.is-done .kit__lines circle { opacity: 1; }
   .kit__list { list-style: none; margin: 36px 0 0; padding: 0; }
   .kit__item { padding: 20px 0; border-top: 1px solid var(--line-2); }
   .kit__item:last-child { border-bottom: 1px solid var(--line-2); }
@@ -359,6 +376,7 @@ gtag('config', 'G-8P7TF4SV17');
     .sec { padding: 64px 0; }
     .hero + .sec { margin-top: 48px; }
     .kit__img, .why__img { border-radius: var(--r-lg); }
+    .kit__tag { font-size: 12px; padding: 7px 10px; border-radius: 7px; }
     .idea__text { font-size: 17px; }
     .why__item { grid-template-columns: 40px minmax(0, 1fr); padding: 22px 0; }
     .why__n { padding-top: 5px; }
@@ -451,8 +469,18 @@ gtag('config', 'G-8P7TF4SV17');
   <section class="sec sec--tint" id="kit">
     <div class="wrap">
       <div class="kit__grid">
-        <div class="kit__img reveal">
-          <img src="assets/livoltek/kit.jpg" width="1040" height="1000" alt="Склад комплекту: інвертор, батарея, декоративні панелі" loading="lazy" />
+        <div class="kit__img reveal" id="kitAnim" role="img" aria-label="Livoltek All-in-One у розібраному вигляді: інвертор, батарея і декоративні панелі">
+          <video id="kitVideo" muted playsinline preload="auto" poster="assets/livoltek/kit-explode-start.jpg" aria-hidden="true">
+            <source src="assets/livoltek/kit-explode.mp4" type="video/mp4" />
+          </video>
+          <svg class="kit__lines" viewBox="0 0 100 100" aria-hidden="true">
+            <line pathLength="1" x1="22" y1="9" x2="35.6" y2="19" /><circle cx="35.6" cy="19" r=".55" />
+            <line pathLength="1" x1="75.2" y1="8.5" x2="75.2" y2="13.9" /><circle cx="75.2" cy="13.9" r=".55" />
+            <line pathLength="1" x1="55" y1="90.5" x2="51.9" y2="77.8" /><circle cx="51.9" cy="77.8" r=".55" />
+          </svg>
+          <span class="kit__tag" style="--x:15.5%;--y:6.5%">Інвертор</span>
+          <span class="kit__tag" style="--x:73%;--y:5.5%">Декоративні панелі</span>
+          <span class="kit__tag" style="--x:60%;--y:93.5%">Батарея</span>
         </div>
         <div class="reveal">
           <span class="kicker">Комплект</span>
@@ -713,6 +741,27 @@ if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   heroVideo.src = 'assets/livoltek/' + (tall ? 'hero-tall.mp4' : 'hero-wide.mp4');
   const p = heroVideo.play();
   if (p && p.catch) p.catch(() => {});
+}
+
+// ---- комплект: система розбирається на частини, коли блок у полі зору; раз за відвідування ----
+const kitAnim = document.getElementById('kitAnim');
+const kitVideo = document.getElementById('kitVideo');
+if (kitAnim && kitVideo) {
+  const done = () => kitAnim.classList.add('is-done');
+  const still = () => { kitAnim.classList.add('is-static'); done(); };
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
+    still();
+  } else {
+    kitVideo.addEventListener('ended', done, { once: true });
+    kitVideo.addEventListener('error', still, { once: true });
+    const kio = new IntersectionObserver(entries => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      kio.disconnect();
+      const p = kitVideo.play();
+      if (p && p.catch) p.catch(still);
+    }, { threshold: 0.6 });
+    kio.observe(kitAnim);
+  }
 }
 </script>
 </body>
