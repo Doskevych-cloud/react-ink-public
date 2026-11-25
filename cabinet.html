@@ -1066,11 +1066,11 @@ function renderCatalog() {
   };
   const wattsForItem = it => extractWatts(it.name) || extractWatts(it.spec);
   const dsIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>';
-  // Колонка «Даташит»: PDF — документ у новій вкладці; інше посилання (сторінка товару на react.ink) — «Огляд»
+  // Колонка «Даташит»: сторінка товару на самому react.ink — «Огляд», у тій самій вкладці;
+  // усе інше (PDF, файл на Google Drive тощо) — «PDF» у новій вкладці, як було.
   const dsLink = u => {
-    const pdf = /\.pdf([?#]|$)/i.test(u);
-    const own = /^(\/|https?:\/\/react\.ink\/)/i.test(u);
-    return `<a class="ds-link" href="${esc(u)}"${own && !pdf ? '' : ' target="_blank" rel="noopener"'}>${dsIcon}${pdf ? 'PDF' : 'Огляд'}</a>`;
+    const page = /^(\/|https?:\/\/react\.ink\/)/i.test(u) && !/\.pdf([?#]|$)/i.test(u);
+    return `<a class="ds-link" href="${esc(u)}"${page ? '' : ' target="_blank" rel="noopener"'}>${dsIcon}${page ? 'Огляд' : 'PDF'}</a>`;
   };
 
   DATA.forEach(c => {
