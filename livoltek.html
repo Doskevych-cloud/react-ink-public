@@ -77,14 +77,24 @@ gtag('config', 'G-8P7TF4SV17');
 
   /* ---------- Top bar ---------- */
   .topbar {
-    position: sticky; top: 0; z-index: 50;
+    position: absolute; top: 0; left: 0; right: 0; z-index: 50;
     background: color-mix(in srgb, var(--paper) 82%, transparent);
     backdrop-filter: saturate(1.2) blur(14px);
     -webkit-backdrop-filter: saturate(1.2) blur(14px);
     border-bottom: 1px solid transparent;
-    transition: border-color .3s var(--ease);
+    transition: border-color .3s var(--ease), background .3s var(--ease);
   }
+  .js .topbar { position: fixed; }
   .topbar.scrolled { border-bottom-color: var(--line); }
+  /* над відео першого екрана — прозора шапка зі світлим текстом */
+  .topbar--over { background: transparent; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .topbar--over.topbar--tint { background: rgba(16,20,27,.62); -webkit-backdrop-filter: saturate(1.2) blur(14px); backdrop-filter: saturate(1.2) blur(14px); }
+  .topbar--over .brand img { filter: brightness(0) invert(1); }
+  .topbar--over .brand__tag { color: rgba(255,255,255,.74); border-left-color: rgba(255,255,255,.3); }
+  .topbar--over .topnav a.topnav__link { color: rgba(255,255,255,.84); }
+  .topbar--over .topnav a.topnav__link:hover { color: #fff; }
+  .topbar--over .btn--ghost { color: #fff; border-color: rgba(255,255,255,.42); }
+  .topbar--over .btn--ghost:hover { background: rgba(255,255,255,.14); border-color: rgba(255,255,255,.72); }
   .topbar__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; gap: 20px; }
   .brand { display: flex; align-items: center; gap: 14px; }
   .brand img { height: 32px; width: auto; }
@@ -121,42 +131,80 @@ gtag('config', 'G-8P7TF4SV17');
   .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
   .kicker { font-size: 12.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
 
-  /* ---------- Hero ---------- */
-  .hero { padding: 72px 0 0; }
-  .hero__grid { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); gap: 64px; align-items: center; }
-  h1.hero__title {
-    font-size: clamp(46px, 6.4vw, 84px); line-height: 0.96; letter-spacing: -.04em;
-    font-weight: 700; margin-top: 24px;
+  /* ---------- Hero: відео на весь перший екран ---------- */
+  .hero { position: relative; }
+  .hero__stage {
+    position: relative; overflow: hidden; color: #fff; background: #161C25;
+    min-height: 100vh; min-height: 100svh; display: flex; align-items: center;
   }
-  .hero__title .muted { color: var(--ink-3); }
-  .hero__sub { font-size: 19px; line-height: 1.55; color: var(--ink-2); margin-top: 26px; max-width: 40ch; }
+  .hero__bg { position: absolute; inset: 0; background: #161C25 url('assets/livoltek/hero-wide.jpg') 62% 50% / cover no-repeat; }
+  .hero__bg video {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 62% 50%;
+    opacity: 0; transition: opacity .9s var(--ease);
+  }
+  .hero__bg video.is-on { opacity: 1; }
+  .hero__scrim {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(13,17,23,.55) 0, rgba(13,17,23,0) 22%),
+      linear-gradient(0deg, rgba(13,17,23,.84) 0, rgba(13,17,23,.34) 20%, rgba(13,17,23,0) 38%),
+      linear-gradient(90deg, rgba(13,17,23,.80) 0, rgba(13,17,23,.58) 34%, rgba(13,17,23,.12) 60%, rgba(13,17,23,0) 76%);
+  }
+  .hero__inner { position: relative; padding-top: 116px; padding-bottom: 184px; }
+  .hero__copy { max-width: 640px; }
+  .hero__stage .eyebrow { color: #F2A65A; }
+  .hero__stage .kicker { color: rgba(255,255,255,.64); }
+  h1.hero__title {
+    font-size: clamp(46px, 6.6vw, 92px); line-height: 0.96; letter-spacing: -.04em;
+    font-weight: 700; margin-top: 24px; text-shadow: 0 2px 30px rgba(8,11,16,.35);
+  }
+  .hero__title .muted { display: block; color: rgba(255,255,255,.62); }
+  .hero__sub { font-size: 19px; line-height: 1.55; color: rgba(255,255,255,.86); margin-top: 26px; max-width: 42ch; }
 
   .hero__prices { display: flex; margin-top: 36px; }
   .hprice { padding-right: 36px; }
-  .hprice + .hprice { padding-left: 36px; border-left: 1px solid var(--line-2); }
+  .hprice + .hprice { padding-left: 36px; border-left: 1px solid rgba(255,255,255,.28); }
   .hprice__v { font-size: 38px; font-weight: 700; letter-spacing: -.035em; line-height: 1; margin-top: 10px; white-space: nowrap; }
-  .hprice__v small { font-size: 15px; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 4px; }
-  .hprice--rrp .hprice__v { color: var(--ink-2); }
+  .hprice__v small { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.62); letter-spacing: 0; margin-left: 4px; }
+  .hprice--rrp .hprice__v { color: rgba(255,255,255,.8); }
 
   .hero__cta { display: flex; align-items: center; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
+  .btn--light { background: #fff; color: var(--ink); }
+  .btn--light:hover { background: var(--paper-2); transform: translateY(-1px); box-shadow: 0 14px 30px -14px rgba(0,0,0,.6); }
+  .btn--glass { background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.42); color: #fff; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+  .btn--glass:hover { background: rgba(255,255,255,.2); border-color: rgba(255,255,255,.72); }
 
-  .hero__media {
-    position: relative; aspect-ratio: 1 / 1; border-radius: var(--r-xl); overflow: hidden;
-    background: #232B36; box-shadow: var(--shadow-md);
-  }
-  .hero__media video { width: 100%; height: 100%; object-fit: cover; object-position: 40% 50%; }
-
-  .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 76px; border-top: 1px solid var(--line); }
+  /* Рядок цифр: на десктопі лежить унизу відео, на вужчих екранах — під ним на папері */
+  .stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); }
   .stat { padding: 28px 20px 0 0; }
   .stat + .stat { padding-left: 24px; border-left: 1px solid var(--line); }
   .stat__v { font-size: clamp(24px, 2.7vw, 34px); font-weight: 700; letter-spacing: -.035em; line-height: 1; white-space: nowrap; }
   .stat__v small { font-size: .5em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 3px; }
   .stat__k { font-size: 14px; color: var(--ink-2); margin-top: 10px; }
+  @media (min-width: 981px) {
+    .hero__stats { position: absolute; left: 0; right: 0; bottom: 0; padding-bottom: 32px; color: #fff; }
+    .hero__stats .stats { border-top-color: rgba(255,255,255,.22); }
+    .hero__stats .stat { padding-top: 22px; }
+    .hero__stats .stat + .stat { border-left-color: rgba(255,255,255,.16); }
+    .hero__stats .stat__v small { color: rgba(255,255,255,.62); }
+    .hero__stats .stat__k { color: rgba(255,255,255,.76); }
+  }
+  /* Вертикальний екран: вертикальне відео, текст унизу */
+  @media (max-aspect-ratio: 4/5) {
+    .hero__stage { align-items: flex-end; }
+    .hero__bg { background-image: url('assets/livoltek/hero-tall.jpg'); background-position: 50% 50%; }
+    .hero__bg video { object-position: 50% 50%; }
+    .hero__scrim {
+      background:
+        linear-gradient(180deg, rgba(13,17,23,.5) 0, rgba(13,17,23,0) 16%),
+        linear-gradient(0deg, rgba(13,17,23,.95) 0, rgba(13,17,23,.9) 40%, rgba(13,17,23,.74) 58%, rgba(13,17,23,.36) 70%, rgba(13,17,23,0) 84%);
+    }
+  }
 
   /* ---------- Sections ---------- */
   .sec { padding: 108px 0; }
   .sec--tint { background: var(--paper-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .hero + .sec { margin-top: 92px; }
+  .hero + .sec { margin-top: 0; }
   .sec h2 {
     font-size: clamp(30px, 3.9vw, 50px); line-height: 1.02; letter-spacing: -.035em;
     font-weight: 700; margin-top: 14px; text-wrap: balance;
@@ -270,15 +318,13 @@ gtag('config', 'G-8P7TF4SV17');
   }
   @media (max-width: 980px) {
     .topnav .topnav__link { display: none; }
-    .hero { padding-top: 48px; }
-    .hero__grid { grid-template-columns: 1fr; gap: 44px; }
-    .hero__media { aspect-ratio: 16 / 10; }
-    .hero__media video { object-position: 50% 50%; }
-    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 56px; }
+    .hero__inner { padding-top: 104px; padding-bottom: 48px; }
+    .hero__stats { padding-top: 4px; }
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 0; }
     .stat:nth-child(4) { padding-left: 0; border-left: 0; }
     .stat:nth-child(n+4) { margin-top: 28px; border-top: 0; }
     .sec { padding: 80px 0; }
-    .hero + .sec { margin-top: 72px; }
+    .hero + .sec { margin-top: 64px; }
     .kit__grid, .why__grid, .specs__grid { grid-template-columns: 1fr; gap: 44px; }
     .why__aside { position: static; }
     .why__img { aspect-ratio: 16 / 11; max-height: none; }
@@ -295,20 +341,21 @@ gtag('config', 'G-8P7TF4SV17');
     .brand__tag { display: none; }
     .topbar__inner { height: 64px; }
     section[id] { scroll-margin-top: 64px; }
-    .hero { padding-top: 36px; }
-    .hero__sub { font-size: 17.5px; }
+    .hero__inner { padding-top: 96px; padding-bottom: 32px; }
+    .hero__sub { font-size: 16.5px; margin-top: 20px; }
+    .hero__prices { margin-top: 28px; }
     .hprice { padding-right: 24px; }
     .hprice + .hprice { padding-left: 24px; }
     .hprice__v { font-size: 32px; }
-    .hero__cta .btn { flex: 1 1 auto; }
-    .hero__media { border-radius: var(--r-lg); aspect-ratio: 4 / 3; }
-    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 44px; }
+    .hero__cta { margin-top: 28px; gap: 10px; flex-wrap: nowrap; }
+    .hero__cta .btn { flex: 1 1 auto; padding: 14px 16px; font-size: 15px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .stat, .stat + .stat { padding: 22px 12px 0 0; border-left: 0; margin-top: 0; }
     .stat:nth-child(even) { padding-left: 20px; border-left: 1px solid var(--line); }
     .stat:nth-child(n+3) { margin-top: 22px; border-top: 1px solid var(--line); }
     .stat:last-child { grid-column: 1 / -1; }
     .sec { padding: 64px 0; }
-    .hero + .sec { margin-top: 56px; }
+    .hero + .sec { margin-top: 48px; }
     .kit__img, .why__img { border-radius: var(--r-lg); }
     .why__item { grid-template-columns: 40px minmax(0, 1fr); padding: 24px 0; }
     .why__d { font-size: 16px; }
@@ -334,7 +381,7 @@ gtag('config', 'G-8P7TF4SV17');
 <body>
 
 <!-- ============ TOP BAR ============ -->
-<header class="topbar" id="topbar">
+<header class="topbar topbar--over" id="topbar">
   <div class="wrap topbar__inner">
     <a class="brand" href="/" aria-label="React — прайс">
       <img src="assets/react-logo.png" alt="React" />
@@ -353,8 +400,12 @@ gtag('config', 'G-8P7TF4SV17');
 <main>
   <!-- ============ HERO ============ -->
   <section class="hero" id="top">
-    <div class="wrap">
-      <div class="hero__grid">
+    <div class="hero__stage">
+      <div class="hero__bg" aria-hidden="true">
+        <video id="heroVideo" autoplay muted loop playsinline preload="auto"></video>
+      </div>
+      <div class="hero__scrim" aria-hidden="true"></div>
+      <div class="wrap hero__inner">
         <div class="hero__copy">
           <span class="eyebrow"><span class="dot"></span>Для дилерів · передзамовлення</span>
           <h1 class="hero__title">Livoltek <span class="muted nw">All-in-One</span></h1>
@@ -370,23 +421,21 @@ gtag('config', 'G-8P7TF4SV17');
             </div>
           </div>
           <div class="hero__cta">
-            <a class="btn btn--solid btn--lg" href="#order">Передзамовити <span class="arr" data-arrow></span></a>
-            <a class="btn btn--ghost btn--lg" href="assets/livoltek/Livoltek_iPower_AES1_User_Manual_UA.pdf" target="_blank" rel="noopener">Посібник, PDF</a>
+            <a class="btn btn--light btn--lg" href="#order">Передзамовити <span class="arr" data-arrow></span></a>
+            <a class="btn btn--glass btn--lg" href="assets/livoltek/Livoltek_iPower_AES1_User_Manual_UA.pdf" target="_blank" rel="noopener">Посібник, PDF</a>
           </div>
         </div>
-        <div class="hero__media">
-          <video id="heroVideo" autoplay muted loop playsinline preload="auto" poster="assets/livoltek/hero-poster.jpg" aria-label="Livoltek All-in-One">
-            <source src="assets/livoltek/hero.mp4" type="video/mp4" />
-          </video>
-        </div>
       </div>
-
-      <div class="stats">
-        <div class="stat"><div class="stat__v">5<small>кВт</small></div><div class="stat__k">інвертор</div></div>
-        <div class="stat"><div class="stat__v">5,12<small>кВт·год</small></div><div class="stat__k">LiFePO4, з&nbsp;розширенням до&nbsp;2&nbsp;акумуляторів</div></div>
-        <div class="stat"><div class="stat__v">&lt;&nbsp;10<small>мс</small></div><div class="stat__k">перемикання</div></div>
-        <div class="stat"><div class="stat__v">&lt;&nbsp;35<small>дБ</small></div><div class="stat__k">рівень шуму, без&nbsp;вентиляторів</div></div>
-        <div class="stat"><div class="stat__v">10<small>років</small></div><div class="stat__k">гарантія</div></div>
+    </div>
+    <div class="hero__stats">
+      <div class="wrap">
+        <div class="stats">
+          <div class="stat"><div class="stat__v">5<small>кВт</small></div><div class="stat__k">інвертор</div></div>
+          <div class="stat"><div class="stat__v">5,12<small>кВт·год</small></div><div class="stat__k">LiFePO4, з&nbsp;розширенням до&nbsp;2&nbsp;акумуляторів</div></div>
+          <div class="stat"><div class="stat__v">&lt;&nbsp;10<small>мс</small></div><div class="stat__k">перемикання</div></div>
+          <div class="stat"><div class="stat__v">&lt;&nbsp;35<small>дБ</small></div><div class="stat__k">рівень шуму, без&nbsp;вентиляторів</div></div>
+          <div class="stat"><div class="stat__v">10<small>років</small></div><div class="stat__k">гарантія</div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -628,10 +677,17 @@ const ICONS = {
 document.querySelectorAll('[data-arrow]').forEach(el => { el.innerHTML = ARROW; });
 document.querySelectorAll('[data-ic]').forEach(el => { el.style.display = 'inline-flex'; el.innerHTML = ICONS[el.dataset.ic] || ''; });
 
-// ---- topbar scrolled state ----
+// ---- шапка: прозора над відео першого екрана, звичайна нижче ----
 const topbar = document.getElementById('topbar');
-const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 8);
+const stage = document.querySelector('.hero__stage');
+const onScroll = () => {
+  const over = window.scrollY < stage.offsetHeight - 84;
+  topbar.classList.toggle('topbar--over', over);
+  topbar.classList.toggle('topbar--tint', over && window.scrollY > 12);
+  topbar.classList.toggle('scrolled', !over);
+};
 window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', onScroll);
 onScroll();
 
 // ---- поява блоків при прокрутці ----
@@ -645,11 +701,15 @@ if ('IntersectionObserver' in window) {
   reveals.forEach(el => el.classList.add('in'));
 }
 
-// ---- відео: без автопрогравання, якщо в системі вимкнено анімації ----
+// ---- відео першого екрана: широке або вертикальне за формою екрана;
+//      якщо в системі вимкнено анімації — лишається нерухома заставка ----
 const heroVideo = document.getElementById('heroVideo');
-if (heroVideo && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  heroVideo.removeAttribute('autoplay');
-  heroVideo.pause();
+if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const tall = window.matchMedia('(max-aspect-ratio: 4/5)').matches;
+  heroVideo.addEventListener('playing', () => heroVideo.classList.add('is-on'), { once: true });
+  heroVideo.src = 'assets/livoltek/' + (tall ? 'hero-tall.mp4' : 'hero-wide.mp4');
+  const p = heroVideo.play();
+  if (p && p.catch) p.catch(() => {});
 }
 </script>
 </body>
