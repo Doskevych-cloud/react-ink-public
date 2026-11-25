@@ -11,7 +11,7 @@ gtag('js', new Date());
 gtag('config', 'G-8P7TF4SV17');
 </script>
 <title>Livoltek All-in-One — пропозиція для дилерів · React</title>
-<meta name="description" content="Livoltek All-in-One: інвертор 5 кВт і акумулятор LiFePO4 5,12 кВт·год одним комплектом. Умови для дилерів React, передзамовлення і резерв." />
+<meta name="description" content="Livoltek All-in-One: інвертор 5 кВт і акумулятор LiFePO4 5,12 кВт·год в одній системі. Умови для дилерів React, передзамовлення і резерв." />
 <meta name="robots" content="noindex" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://react.ink/livoltek" />
@@ -153,20 +153,12 @@ gtag('config', 'G-8P7TF4SV17');
   .hero__inner { position: relative; padding-top: 116px; padding-bottom: 184px; }
   .hero__copy { max-width: 640px; }
   .hero__stage .eyebrow { color: #F2A65A; }
-  .hero__stage .kicker { color: rgba(255,255,255,.64); }
   h1.hero__title {
     font-size: clamp(46px, 6.6vw, 92px); line-height: 0.96; letter-spacing: -.04em;
     font-weight: 700; margin-top: 24px; text-shadow: 0 2px 30px rgba(8,11,16,.35);
   }
   .hero__title .muted { display: block; color: rgba(255,255,255,.62); }
   .hero__sub { font-size: 19px; line-height: 1.55; color: rgba(255,255,255,.86); margin-top: 26px; max-width: 42ch; }
-
-  .hero__prices { display: flex; margin-top: 36px; }
-  .hprice { padding-right: 36px; }
-  .hprice + .hprice { padding-left: 36px; border-left: 1px solid rgba(255,255,255,.28); }
-  .hprice__v { font-size: 38px; font-weight: 700; letter-spacing: -.035em; line-height: 1; margin-top: 10px; white-space: nowrap; }
-  .hprice__v small { font-size: 15px; font-weight: 600; color: rgba(255,255,255,.62); letter-spacing: 0; margin-left: 4px; }
-  .hprice--rrp .hprice__v { color: rgba(255,255,255,.8); }
 
   .hero__cta { display: flex; align-items: center; gap: 12px; margin-top: 36px; flex-wrap: wrap; }
   .btn--light { background: #fff; color: var(--ink); }
@@ -221,6 +213,9 @@ gtag('config', 'G-8P7TF4SV17');
   .kit__code { font-size: 13px; color: var(--accent-deep); font-weight: 500; letter-spacing: .01em; }
   .kit__name { font-size: 20px; font-weight: 600; letter-spacing: -.02em; line-height: 1.25; margin-top: 6px; }
   .kit__desc { font-size: 15px; color: var(--ink-2); margin-top: 4px; }
+  .kit__more { margin-top: 28px; }
+  .kit__more p { font-size: 15.5px; line-height: 1.55; color: var(--ink-2); margin-top: 8px; max-width: 46ch; }
+  .kit__more .mono { font-size: .9em; color: var(--ink); }
   .doclink {
     display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 2px 10px; margin-top: 30px;
     font-size: 15px; font-weight: 600; color: var(--ink);
@@ -258,25 +253,17 @@ gtag('config', 'G-8P7TF4SV17');
   .note b { color: var(--ink); font-weight: 600; }
 
   /* ---------- Чому це цікаво вам ---------- */
-  .args { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 20px; margin-top: 48px; }
-  .arg { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 38px; }
+  .args { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 48px; }
+  .arg { background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 34px; }
   .arg--dark { background: var(--ink); border-color: var(--ink); color: var(--paper); }
-  .arg--price { grid-column: 1 / -1; padding: 0; }
-  .arg__head { padding: 38px 38px 30px; }
   .arg__n { font-size: 13px; color: var(--accent-deep); font-weight: 500; }
   .arg--dark .arg__n { color: var(--accent); }
-  .arg__t { font-size: clamp(23px, 2.6vw, 31px); font-weight: 700; letter-spacing: -.03em; line-height: 1.1; margin-top: 16px; text-wrap: balance; }
-  .arg__d { font-size: 16.5px; line-height: 1.55; color: var(--ink-2); margin-top: 12px; max-width: 52ch; }
+  .arg__t { font-size: clamp(21px, 2.1vw, 26px); font-weight: 700; letter-spacing: -.028em; line-height: 1.12; margin-top: 16px; text-wrap: balance; }
+  .arg__d { font-size: 16px; line-height: 1.55; color: var(--ink-2); margin-top: 12px; }
   .arg--dark .arg__d { color: rgba(251,250,246,.72); }
-  .deal__cells { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
-  .deal__cell { padding: 32px 38px 36px; }
-  .deal__cell + .deal__cell { border-left: 1px solid var(--line); }
-  .deal__v { font-size: clamp(40px, 5.2vw, 66px); font-weight: 700; letter-spacing: -.045em; line-height: 1; margin-top: 18px; white-space: nowrap; }
-  .deal__v small { font-size: .32em; font-weight: 600; color: var(--ink-3); letter-spacing: 0; margin-left: 6px; }
-  .deal__v .pre { font-size: .42em; font-weight: 600; letter-spacing: -.01em; margin-right: 8px; }
-  .deal__n { font-size: 15px; line-height: 1.45; color: var(--ink-2); margin-top: 16px; }
-  .deal__cell--gain .deal__v { color: var(--ok); }
-  .deal__cell--gain .deal__v small { color: var(--ok); opacity: .7; }
+  .arg .doclink { margin-top: 20px; }
+  .doclink .arr { color: inherit; display: inline-flex; transform: translateY(1px); transition: transform .3s var(--ease); }
+  .doclink:hover .arr { transform: translate(4px, 1px); }
 
   .order {
     margin-top: 20px; display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 56px; align-items: center;
@@ -331,9 +318,6 @@ gtag('config', 'G-8P7TF4SV17');
     .why__img img { object-position: 50% 22%; }
     .specs__shot img { width: min(70%, 320px); }
     .args { grid-template-columns: 1fr; }
-    .deal__cells { grid-template-columns: 1fr; }
-    .deal__cell + .deal__cell { border-left: 0; border-top: 1px solid var(--line); }
-    .deal__cell { padding: 30px 32px; }
     .order { grid-template-columns: 1fr; gap: 32px; }
   }
   @media (max-width: 620px) {
@@ -343,10 +327,6 @@ gtag('config', 'G-8P7TF4SV17');
     section[id] { scroll-margin-top: 64px; }
     .hero__inner { padding-top: 96px; padding-bottom: 32px; }
     .hero__sub { font-size: 16.5px; margin-top: 20px; }
-    .hero__prices { margin-top: 28px; }
-    .hprice { padding-right: 24px; }
-    .hprice + .hprice { padding-left: 24px; }
-    .hprice__v { font-size: 32px; }
     .hero__cta { margin-top: 28px; gap: 10px; flex-wrap: nowrap; }
     .hero__cta .btn { flex: 1 1 auto; padding: 14px 16px; font-size: 15px; }
     .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -363,10 +343,6 @@ gtag('config', 'G-8P7TF4SV17');
     .spec dt { font-size: 14px; }
     .args { margin-top: 36px; gap: 14px; }
     .arg { padding: 28px 24px; }
-    .arg--price { padding: 0; }
-    .arg__head { padding: 28px 24px 24px; }
-    .arg__d { font-size: 16px; }
-    .deal__cell { padding: 26px 24px; }
     .order { padding: 28px 20px; }
     .mgr { flex-wrap: wrap; padding: 16px; }
     .mgr .btn { margin-left: 0; width: 100%; }
@@ -391,7 +367,7 @@ gtag('config', 'G-8P7TF4SV17');
       <a class="topnav__link" href="#kit">Комплект</a>
       <a class="topnav__link" href="#clients">Клієнтам</a>
       <a class="topnav__link" href="#specs">Характеристики</a>
-      <a class="topnav__link" href="#deal">Ціни</a>
+      <a class="topnav__link" href="#deal">Дилерам</a>
       <a class="btn btn--ghost" href="#order">Передзамовити</a>
     </nav>
   </div>
@@ -409,20 +385,10 @@ gtag('config', 'G-8P7TF4SV17');
         <div class="hero__copy">
           <span class="eyebrow"><span class="dot"></span>Для дилерів · передзамовлення</span>
           <h1 class="hero__title">Livoltek <span class="muted nw">All-in-One</span></h1>
-          <p class="hero__sub">Інвертор 5&nbsp;кВт і акумулятор LiFePO4 на 5,12&nbsp;кВт·год одним комплектом. Приймаємо передзамовлення і ставимо резерви.</p>
-          <div class="hero__prices">
-            <div class="hprice">
-              <div class="kicker">Ціна для дилера</div>
-              <div class="hprice__v">1&nbsp;375<small>USD</small></div>
-            </div>
-            <div class="hprice hprice--rrp">
-              <div class="kicker">РРЦ</div>
-              <div class="hprice__v">1&nbsp;595<small>USD</small></div>
-            </div>
-          </div>
+          <p class="hero__sub">Інвертор 5&nbsp;кВт і акумулятор LiFePO4 на 5,12&nbsp;кВт·год в одній системі. Приймаємо передзамовлення і ставимо резерви.</p>
           <div class="hero__cta">
             <a class="btn btn--light btn--lg" href="#order">Передзамовити <span class="arr" data-arrow></span></a>
-            <a class="btn btn--glass btn--lg" href="assets/livoltek/Livoltek_iPower_AES1_User_Manual_UA.pdf" target="_blank" rel="noopener">Посібник, PDF</a>
+            <a class="btn btn--glass btn--lg" href="/#all-in-one">Ціни в прайсі</a>
           </div>
         </div>
       </div>
@@ -449,7 +415,7 @@ gtag('config', 'G-8P7TF4SV17');
         </div>
         <div class="reveal">
           <span class="kicker">Комплект</span>
-          <h2>Три позиції — одна система</h2>
+          <h2>Дві позиції — одна система</h2>
           <ul class="kit__list">
             <li class="kit__item">
               <div class="kit__code mono">AES1-5KEG1</div>
@@ -459,14 +425,13 @@ gtag('config', 'G-8P7TF4SV17');
             <li class="kit__item">
               <div class="kit__code mono">AES-5KWHG1</div>
               <div class="kit__name">Акумулятор 5,12&nbsp;кВт·год</div>
-              <div class="kit__desc">LiFePO4, з розширенням до 2&nbsp;акумуляторів</div>
-            </li>
-            <li class="kit__item">
-              <div class="kit__code mono">AC1-AES</div>
-              <div class="kit__name">Комплект аксесуарів</div>
+              <div class="kit__desc">LiFePO4</div>
             </li>
           </ul>
-          <a class="doclink" href="assets/livoltek/Livoltek_iPower_AES1_User_Manual_UA.pdf" target="_blank" rel="noopener">Посібник користувача українською <span>PDF · 3,4&nbsp;МБ</span></a>
+          <div class="kit__more">
+            <span class="kicker">Розширення</span>
+            <p>Другий акумулятор <span class="mono">AES-5KWHG1</span> — разом до 10,24&nbsp;кВт·год. Комплект аксесуарів <span class="mono">AC1-AES</span> потрібен лише з другим акумулятором.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -523,7 +488,7 @@ gtag('config', 'G-8P7TF4SV17');
             <span class="why__n mono">06</span>
             <div>
               <div class="why__t">Гарантія 10&nbsp;років</div>
-              <p class="why__d">У разі поломки — заміна на новий.</p>
+              <p class="why__d">У разі несправності — заміна на новий.</p>
             </div>
           </li>
         </ol>
@@ -538,8 +503,6 @@ gtag('config', 'G-8P7TF4SV17');
         <div class="reveal">
           <span class="kicker">Характеристики</span>
           <h2>Коротко про систему</h2>
-          <p class="lead">Повні дані й схеми підключення — у посібнику користувача.</p>
-          <a class="doclink" href="assets/livoltek/Livoltek_iPower_AES1_User_Manual_UA.pdf" target="_blank" rel="noopener">Відкрити посібник <span>PDF · 3,4&nbsp;МБ</span></a>
           <div class="specs__shot">
             <img src="assets/livoltek/unit.webp" width="800" height="800" alt="Livoltek All-in-One, вигляд у три чверті" loading="lazy" />
           </div>
@@ -547,7 +510,7 @@ gtag('config', 'G-8P7TF4SV17');
         <div class="reveal">
           <dl class="specs__list">
             <div class="spec"><dt>Інвертор</dt><dd>5&nbsp;кВт, однофазний, 220/230&nbsp;В</dd></div>
-            <div class="spec"><dt>Акумулятор</dt><dd>5,12&nbsp;кВт·год, LiFePO4, з розширенням до 2&nbsp;акумуляторів</dd></div>
+            <div class="spec"><dt>Акумулятор</dt><dd>5,12&nbsp;кВт·год, LiFePO4, з розширенням до 2&nbsp;акумуляторів (10,24&nbsp;кВт·год)</dd></div>
             <div class="spec"><dt>Резервне живлення</dt><dd>Окремий вихід EPS, перемикання менш ніж за 10&nbsp;мс</dd></div>
             <div class="spec"><dt>Режими роботи</dt><dd>Власне споживання, за розкладом, резерв, автономний</dd></div>
             <div class="spec"><dt>Рівень шуму</dt><dd>Менше 35&nbsp;дБ, без вентиляторів</dd></div>
@@ -556,7 +519,7 @@ gtag('config', 'G-8P7TF4SV17');
             <div class="spec"><dt>Робоча температура</dt><dd>Від −10 до +60&nbsp;°C</dd></div>
             <div class="spec"><dt>Моніторинг</dt><dd>Застосунок My&nbsp;Livoltek і вебпортал, Wi-Fi-модуль у комплекті</dd></div>
           </dl>
-          <div class="note"><b>Тип системи — AC Couple.</b> Підключається по змінному струму до мережі й працює з наявною сонячною станцією через її мережевий інвертор. Сонячні панелі напряму до системи не підключаються.</div>
+          <div class="note"><b>Тип системи — AC Couple.</b> Сонячні панелі напряму до системи не підключаються.</div>
         </div>
       </div>
     </div>
@@ -574,35 +537,18 @@ gtag('config', 'G-8P7TF4SV17');
         <div class="arg reveal">
           <span class="arg__n mono">01</span>
           <h3 class="arg__t">Простий монтаж</h3>
-          <p class="arg__d">Ставиться на підлогу, без обовʼязкового настінного кріплення. Інвертор, акумулятор і аксесуари приходять одним комплектом.</p>
+          <p class="arg__d">Ставиться на підлогу, без обовʼязкового настінного кріплення. Уся система — дві позиції: інвертор і акумулятор.</p>
         </div>
         <div class="arg arg--dark reveal">
           <span class="arg__n mono">02</span>
           <h3 class="arg__t">Гарантія 10&nbsp;років із заміною на новий</h3>
-          <p class="arg__d">Зламався — міняємо на новий. Без тестувань і очікування ремонту, без монтажу підмінного, а потім відремонтованого інвертора. Ви ставите новий — і забуваєте.</p>
+          <p class="arg__d">У разі несправності міняємо на новий: без тестувань і очікування ремонту, без монтажу підмінного, а потім відремонтованого інвертора. Ви ставите новий — і забуваєте.</p>
         </div>
-        <div class="arg arg--price reveal">
-          <div class="arg__head">
-            <span class="arg__n mono">03</span>
-            <h3 class="arg__t">Справедлива ціна, яка дає можливість заробити</h3>
-          </div>
-          <div class="deal__cells">
-            <div class="deal__cell">
-              <div class="kicker">Ціна для дилера</div>
-              <div class="deal__v">1&nbsp;375<small>USD</small></div>
-              <div class="deal__n">За комплект</div>
-            </div>
-            <div class="deal__cell">
-              <div class="kicker">РРЦ</div>
-              <div class="deal__v">1&nbsp;595<small>USD</small></div>
-              <div class="deal__n">Нижче продавати не можна, вище — можна</div>
-            </div>
-            <div class="deal__cell deal__cell--gain">
-              <div class="kicker">Ваш заробіток</div>
-              <div class="deal__v"><span class="pre">від</span>220<small>USD</small></div>
-              <div class="deal__n">З кожного комплекту</div>
-            </div>
-          </div>
+        <div class="arg reveal">
+          <span class="arg__n mono">03</span>
+          <h3 class="arg__t">Справедлива ціна, яка дає можливість заробити</h3>
+          <p class="arg__d">Актуальні ціни й наявність — у прайсі.</p>
+          <a class="doclink" href="/#all-in-one">Відкрити прайс <span class="arr" data-arrow></span></a>
         </div>
       </div>
 
@@ -663,7 +609,6 @@ gtag('config', 'G-8P7TF4SV17');
     </div>
     <div class="foot__bottom">
       <span>© 2026 React. Усі права захищено.</span>
-      <span>Ціни вказані в USD за курсом НБУ на день відвантаження.</span>
     </div>
   </div>
 </footer>
