@@ -27,7 +27,7 @@ gtag('config', 'G-8P7TF4SV17');
 <script>document.documentElement.classList.add('js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500&family=Open+Sans:wght@600;700&display=swap" rel="stylesheet" />
 <style>
   /* Токени й базові елементи — ті самі, що у verify.html */
   :root {
@@ -261,6 +261,77 @@ gtag('config', 'G-8P7TF4SV17');
   .why__t { font-size: var(--fs-h3); font-weight: 600; letter-spacing: -.025em; line-height: 1.2; }
   .why__d { font-size: 16px; line-height: 1.55; color: var(--ink-2); margin-top: 8px; max-width: 46ch; }
 
+  /* ---------- Відео виробника: темна смуга; субтитри — прямо на відео, без підкладки ---------- */
+  .sec--film { background: #161C25; color: #fff; }
+  .sec--film .kicker { color: rgba(255,255,255,.55); }
+  .film__head { text-align: center; }
+  .film__lead { font-size: 16px; line-height: 1.5; color: rgba(255,255,255,.6); margin-top: 14px; }
+  /* відео має влазити в екран ноутбука під шапкою */
+  .film { margin: 44px auto 0; max-width: min(100%, 1000px); max-width: min(100%, 1000px, calc((100svh - 180px) * 16 / 9)); }
+  .film__screen { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-xl); overflow: hidden; background: #0E1217; container-type: inline-size; }
+  .film__screen:fullscreen { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+  .film__screen:-webkit-full-screen { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; }
+  .film__screen video { width: 100%; height: 100%; object-fit: contain; background: #0E1217; }
+  /* титри — як в оригіналі ролика (англійські стерто з кадру): Open Sans, заголовок великими з розрядкою, рядки під
+     ним, внизу ліворуч; розмір — від ширини відео, на телефоні не дрібніше 11 / 10,5 px */
+  .film__sub {
+    position: absolute; left: 10%; right: 8%; bottom: 12%; z-index: 2; pointer-events: none;
+    font-family: 'Open Sans', system-ui, sans-serif; color: #fff; text-align: left;
+    text-shadow: 0 0 8px rgba(0,0,0,.25);
+    opacity: 0; transition: opacity .45s var(--ease);
+  }
+  .film__sub.is-on { opacity: 1; }
+  .film__sub.is-top { bottom: auto; top: 9%; }
+  .film__sub b {
+    display: block; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; line-height: 1.3; margin-bottom: .3em;
+    font-size: 15px; font-size: max(11px, 1.6cqw);
+  }
+  .film__sub span { display: block; font-weight: 600; line-height: 1.45; font-size: 14px; font-size: max(10.5px, 1.45cqw); }
+  .film__play {
+    position: absolute; inset: 0; z-index: 4; display: none; align-items: flex-end; padding: 32px;
+    border: 0; margin: 0; font: inherit; color: var(--ink); cursor: pointer;
+    background: linear-gradient(0deg, rgba(13,17,23,.55) 0, rgba(13,17,23,0) 42%);
+  }
+  .js .film__play { display: flex; }
+  .js .film.is-on .film__play { display: none; }
+  .film__btn {
+    display: inline-flex; align-items: center; gap: 12px; padding: 9px 22px 9px 9px; border-radius: 999px;
+    background: #fff; font-size: 15.5px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap;
+    transition: transform .3s var(--ease);
+  }
+  .film__btn i { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; }
+  .film__btn i::before { content: ''; margin-left: 3px; border-left: 11px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+  .film__btn small { font-size: 1em; font-weight: 500; color: var(--ink-3); }
+  .film__play:hover .film__btn { transform: scale(1.04); }
+  .film__play:focus-visible { outline: 2px solid #fff; outline-offset: -6px; }
+  /* свої кнопки замість штатних: штатна панель лягала б на субтитри */
+  .film__ui { position: absolute; inset: 0; z-index: 3; display: none; }
+  .js .film.is-on .film__ui { display: block; }
+  .film__hit { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; }
+  .film.is-idle .film__hit { cursor: none; }
+  .film__hit:focus-visible { outline: 2px solid #fff; outline-offset: -6px; }
+  .film__mid {
+    position: absolute; left: 50%; top: 50%; width: 68px; height: 68px; margin: -34px 0 0 -34px; border-radius: 50%;
+    background: rgba(255,255,255,.94); display: grid; place-items: center; pointer-events: none; opacity: 0; transition: opacity .2s var(--ease);
+  }
+  .film__mid::before { content: ''; margin-left: 5px; border-left: 19px solid var(--accent); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+  .film.is-paused .film__mid { opacity: 1; }
+  .film__tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; transition: opacity .3s var(--ease); }
+  .film.is-idle .film__tools { opacity: 0; pointer-events: none; }
+  .film__ico {
+    width: 38px; height: 38px; margin: 0; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+    color: #fff; background: rgba(13,17,23,.48); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); transition: background .2s;
+  }
+  .film__ico:hover { background: rgba(13,17,23,.72); }
+  .film__ico:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .film__ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .film__ico .i-off, .film.is-muted .film__mute .i-on, .film.is-full .film__full .i-on { display: none; }
+  .film.is-muted .film__mute .i-off, .film.is-full .film__full .i-off { display: block; }
+  .film__bar { position: absolute; left: 0; right: 0; bottom: 0; height: 16px; cursor: pointer; }
+  .film__bar::before, .film__bar span { content: ''; position: absolute; left: 0; bottom: 0; height: 3px; }
+  .film__bar::before { right: 0; background: rgba(255,255,255,.24); }
+  .film__bar span { width: 0; background: #fff; }
+
 
   /* ---------- Характеристики ---------- */
   .specs__grid { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 80px; align-items: start; }
@@ -376,7 +447,18 @@ gtag('config', 'G-8P7TF4SV17');
     .stat:last-child { grid-column: 1 / -1; }
     .sec { padding: 64px 0; }
     .hero + .sec { margin-top: 48px; }
-    .kit__img, .why__img { border-radius: var(--r-lg); }
+    .kit__img, .why__img, .film__screen { border-radius: var(--r-lg); }
+    .film { margin-top: 32px; }
+    .film__lead { font-size: 15px; margin-top: 10px; }
+    .film__play { padding: 14px; }
+    .film__btn { gap: 9px; padding: 7px 14px 7px 7px; font-size: 14px; }
+    .film__lbl { display: none; }
+    .film__btn i { width: 30px; height: 30px; }
+    .film__btn i::before { border-left-width: 9px; border-top-width: 6px; border-bottom-width: 6px; margin-left: 2px; }
+    .film__sub { left: 6%; right: 5%; bottom: 9%; }
+    .film__tools { top: 8px; right: 8px; gap: 6px; }
+    .film__ico { width: 34px; height: 34px; }
+    .film__mid { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
     .kit__tag { font-size: 12px; padding: 7px 10px; border-radius: 7px; }
     .idea__text { font-size: 17px; }
     .why__item { grid-template-columns: 40px minmax(0, 1fr); padding: 22px 0; }
@@ -557,6 +639,38 @@ gtag('config', 'G-8P7TF4SV17');
           </li>
         </ol>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ ВІДЕО ============ -->
+  <section class="sec sec--film" id="video">
+    <div class="wrap">
+      <div class="film__head reveal">
+        <span class="kicker">Відео</span>
+        <h2>Хвилина про систему</h2>
+        <p class="film__lead">Ролик виробника з українськими субтитрами</p>
+      </div>
+      <figure class="film reveal" id="film">
+        <div class="film__screen">
+          <video controls playsinline preload="none" poster="assets/livoltek/film-poster.jpg">
+            <source src="assets/livoltek/film-1080.mp4" type="video/mp4" />
+            <track kind="subtitles" srclang="uk" label="Українська" src="assets/livoltek/film.uk.vtt" default />
+          </video>
+          <div class="film__sub" aria-hidden="true"></div>
+          <button class="film__play" type="button" aria-label="Дивитися відео, 57 секунд">
+            <span class="film__btn"><i></i><span class="film__lbl">Дивитися</span><small>0:57</small></span>
+          </button>
+          <div class="film__ui">
+            <button class="film__hit" type="button" aria-label="Пауза"></button>
+            <span class="film__mid" aria-hidden="true"></span>
+            <div class="film__tools">
+              <button class="film__ico film__mute" type="button" aria-label="Вимкнути звук"><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-4v14l-4-4H4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3l4-4v14l-4-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+              <button class="film__ico film__full" type="button" aria-label="На весь екран"><svg class="i-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><svg class="i-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+            </div>
+            <div class="film__bar"><span></span></div>
+          </div>
+        </div>
+      </figure>
     </div>
   </section>
 
@@ -778,6 +892,99 @@ if (kitAnim && kitVideo) {
     }, { threshold: 0.6 });
     kio.observe(kitAnim);
   }
+}
+// ---- відео виробника: свій мінімальний плеєр, субтитри — прямо на відео (штатна панель лягала б на них) ----
+const film = document.getElementById('film');
+if (film) {
+  const fv = film.querySelector('video');
+  const scr = film.querySelector('.film__screen');
+  const sub = film.querySelector('.film__sub');
+  const hit = film.querySelector('.film__hit');
+  const bar = film.querySelector('.film__bar');
+  const muteBtn = film.querySelector('.film__mute');
+  const fullBtn = film.querySelector('.film__full');
+  const trackEl = fv.querySelector('track');
+  const tr = trackEl && trackEl.track;
+  const play = () => { const p = fv.play(); if (p && p.catch) p.catch(() => {}); };
+  fv.controls = false;
+  if (tr) {
+    tr.mode = 'hidden';
+    // титр: перший рядок — заголовок, решта — рядки під ним; проявляється й гасне, як в оригіналі
+    tr.addEventListener('cuechange', () => {
+      const c = tr.activeCues && tr.activeCues[0];
+      if (!c) { sub.classList.remove('is-on'); return; }
+      const [head, ...rest] = c.text.split('\n');
+      const b = document.createElement('b');
+      b.textContent = head;
+      sub.replaceChildren(b, ...rest.map(t => { const s = document.createElement('span'); s.textContent = t; return s; }));
+      sub.classList.toggle('is-top', /-top$/.test(c.id));
+      sub.classList.add('is-on');
+    });
+  }
+  // кнопки ховаються, коли відео грає і його не чіпають
+  let idleT, pointer = 'mouse';
+  const wake = () => {
+    film.classList.remove('is-idle');
+    clearTimeout(idleT);
+    idleT = setTimeout(() => { if (!fv.paused) film.classList.add('is-idle'); }, 2500);
+  };
+  scr.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') wake(); });
+  scr.addEventListener('pointerdown', e => { pointer = e.pointerType; });
+  scr.addEventListener('keydown', () => { pointer = 'key'; wake(); });
+  film.querySelector('.film__play').addEventListener('click', () => {
+    if (!film.classList.contains('was-on') && window.matchMedia('(max-width: 720px)').matches) fv.src = 'assets/livoltek/film-720.mp4';
+    if (fv.ended) fv.currentTime = 0;
+    film.classList.add('is-on', 'was-on');
+    play();
+    wake();
+  });
+  // на телефоні перший дотик показує кнопки, другий ставить на паузу
+  hit.addEventListener('click', () => {
+    if (pointer === 'touch' && film.classList.contains('is-idle')) { wake(); return; }
+    if (fv.paused) play(); else fv.pause();
+    wake();
+  });
+  fv.addEventListener('play', () => { film.classList.remove('is-paused'); hit.setAttribute('aria-label', 'Пауза'); });
+  fv.addEventListener('pause', () => { film.classList.add('is-paused'); film.classList.remove('is-idle'); hit.setAttribute('aria-label', 'Продовжити'); });
+  fv.addEventListener('ended', () => {
+    film.classList.remove('is-on', 'is-paused', 'is-idle');
+    sub.classList.remove('is-on');
+    film.querySelector('.film__lbl').textContent = 'Дивитися ще раз';
+  });
+  fv.addEventListener('timeupdate', () => { if (fv.duration) bar.firstElementChild.style.width = (100 * fv.currentTime / fv.duration) + '%'; });
+  bar.addEventListener('click', e => {
+    const r = bar.getBoundingClientRect();
+    if (fv.duration) fv.currentTime = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * fv.duration;
+    wake();
+  });
+  muteBtn.addEventListener('click', () => {
+    fv.muted = !fv.muted;
+    film.classList.toggle('is-muted', fv.muted);
+    muteBtn.setAttribute('aria-label', fv.muted ? 'Увімкнути звук' : 'Вимкнути звук');
+    wake();
+  });
+  // повний екран — увесь блок, щоб субтитри лишались на відео; на iPhone — штатний плеєр із субтитрами з доріжки
+  const fsNow = () => document.fullscreenElement || document.webkitFullscreenElement;
+  fullBtn.addEventListener('click', () => {
+    if (fsNow()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    if (document.fullscreenEnabled && scr.requestFullscreen) {
+      scr.requestFullscreen().then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (e) {} }, () => {});
+    } else if (document.webkitFullscreenEnabled && scr.webkitRequestFullscreen) {
+      scr.webkitRequestFullscreen();
+    } else if (fv.webkitEnterFullscreen) {
+      fv.webkitEnterFullscreen();
+    }
+    wake();
+  });
+  const onFs = () => {
+    const on = fsNow() === scr;
+    film.classList.toggle('is-full', on);
+    fullBtn.setAttribute('aria-label', on ? 'Вийти з повного екрана' : 'На весь екран');
+  };
+  document.addEventListener('fullscreenchange', onFs);
+  document.addEventListener('webkitfullscreenchange', onFs);
+  fv.addEventListener('webkitbeginfullscreen', () => { if (tr) tr.mode = 'showing'; });
+  fv.addEventListener('webkitendfullscreen', () => { if (tr) tr.mode = 'hidden'; });
 }
 </script>
 </body>
