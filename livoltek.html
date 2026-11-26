@@ -821,14 +821,16 @@ if (film) {
     film.classList.add('is-' + s);
     tog.setAttribute('aria-label', s === 'playing' ? 'Пауза' : s === 'ended' ? 'Дивитися ще раз' : 'Дивитися');
   };
+  // заздалегідь — лише заголовок файла (preload=metadata); саме відео тягнемо, коли час грати: поки до блоку
+  // не догорнули, сторінка не має качати мегабайти відео
   const load = () => {
     if (loaded) return;
     loaded = true;
     if (window.matchMedia('(max-width: 720px)').matches) fv.src = 'assets/livoltek/film-720.mp4';   // телефонам — 720p
-    fv.preload = 'auto';
+    fv.preload = 'metadata';
     fv.load();
   };
-  const play = () => { load(); const p = fv.play(); if (p && p.catch) p.catch(() => state('paused')); };
+  const play = () => { load(); fv.preload = 'auto'; const p = fv.play(); if (p && p.catch) p.catch(() => state('paused')); };
   fv.addEventListener('play', () => { state('playing'); if (!raf) raf = requestAnimationFrame(loop); });
   fv.addEventListener('pause', () => { if (!fv.ended) state('paused'); render(); });
   fv.addEventListener('ended', () => { state('ended'); sub.classList.remove('is-on'); cur = -2; ring.style.strokeDashoffset = 0; });
