@@ -206,10 +206,6 @@ gtag('config', 'G-8P7TF4SV17');
   }
   .lead { font-size: 17px; line-height: 1.55; color: var(--ink-2); margin-top: 18px; max-width: 44ch; }
 
-  /* ---------- Без зайвого ---------- */
-  .idea { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 72px; align-items: end; }
-  .idea__text { font-size: 19px; line-height: 1.55; color: var(--ink-2); max-width: 44ch; }
-
   /* ---------- Комплект: заголовок ліворуч, склад праворуч (анімацію розбирання прибрано: її показує відео над блоком) ---------- */
   .kit__grid { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 80px; align-items: start; }
   .kit__list { list-style: none; margin: 0; padding: 0; }
@@ -242,8 +238,8 @@ gtag('config', 'G-8P7TF4SV17');
   .why__t { font-size: var(--fs-h3); font-weight: 600; letter-spacing: -.025em; line-height: 1.2; }
   .why__d { font-size: 16px; line-height: 1.55; color: var(--ink-2); margin-top: 8px; max-width: 46ch; }
 
-  /* ---------- Відео виробника: як на apple.com — без підпису й фону, саме відео; без звуку стартує, коли в кадрі ---------- */
-  .sec--film { padding-top: 0; }
+  /* ---------- Відео виробника: як на apple.com — без підпису й фону, саме відео одразу після першого екрана;
+     без звуку стартує, коли в кадрі ---------- */
   .film { margin: 0 auto; max-width: 100%; max-width: min(100%, calc((100svh - 120px) * 16 / 9)); }
   .film__screen { position: relative; aspect-ratio: 16 / 9; border-radius: var(--r-xl); overflow: hidden; background: #0B0E13; container-type: inline-size; }
   .film__screen video { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -368,7 +364,6 @@ gtag('config', 'G-8P7TF4SV17');
     .hero + .sec { margin-top: 64px; }
     .kit__grid, .why__grid, .specs__grid { grid-template-columns: 1fr; gap: 44px; }
     .kit__grid { gap: 28px; }
-    .idea { grid-template-columns: 1fr; gap: 20px; align-items: start; }
     .why__aside { position: static; }
     .why__img { aspect-ratio: 16 / 11; max-height: none; }
     .why__img img { object-position: 50% 22%; }
@@ -399,7 +394,6 @@ gtag('config', 'G-8P7TF4SV17');
     .film__ctrl { right: 10px; bottom: 10px; gap: 8px; }
     .film__ico { width: 36px; height: 36px; }
     .film__ico > svg { width: 14px; height: 14px; }
-    .idea__text { font-size: 17px; }
     .why__item { grid-template-columns: 40px minmax(0, 1fr); padding: 22px 0; }
     .why__n { padding-top: 5px; }
     .spec { grid-template-columns: 1fr; gap: 3px; padding: 15px 0; }
@@ -470,19 +464,6 @@ gtag('config', 'G-8P7TF4SV17');
           <div class="stat"><div class="stat__v">&lt;&nbsp;35<small>дБ</small></div><div class="stat__k">рівень шуму, без&nbsp;вентиляторів</div></div>
           <div class="stat"><div class="stat__v">10<small>років</small></div><div class="stat__k">гарантія</div></div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ БЕЗ ЗАЙВОГО ============ -->
-  <section class="sec" id="idea">
-    <div class="wrap">
-      <div class="idea reveal">
-        <div>
-          <span class="kicker">Без зайвого</span>
-          <h2>Навіщо квартирі інвертор під сонячні панелі?</h2>
-        </div>
-        <p class="idea__text">Гібридний інвертор зроблений під сонячну станцію. У квартирі панелей не буде, а платити за цю частину все одно довелося б. У&nbsp;Livoltek All-in-One її немає&nbsp;— тільки резервне живлення.</p>
       </div>
     </div>
   </section>
