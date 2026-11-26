@@ -316,6 +316,14 @@ gtag('config', 'G-8P7TF4SV17');
   }
   .film__mid::before { content: ''; margin-left: 5px; border-left: 19px solid var(--accent); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
   .film.is-paused .film__mid { opacity: 1; }
+  /* поки відео вантажиться — кільце замість трикутника (без нього на телефоні здавалось, що відео не відкривається) */
+  .film.is-loading .film__mid { opacity: 1; }
+  .film.is-loading .film__mid::before {
+    width: 26px; height: 26px; margin: 0; box-sizing: border-box;
+    border: 3px solid rgba(23,25,29,.14); border-top-color: var(--accent); border-radius: 50%;
+    animation: film-spin .8s linear infinite;
+  }
+  @keyframes film-spin { to { transform: rotate(360deg); } }
   .film__tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; transition: opacity .3s var(--ease); }
   .film.is-idle .film__tools { opacity: 0; pointer-events: none; }
   .film__ico {
@@ -459,6 +467,8 @@ gtag('config', 'G-8P7TF4SV17');
     .film__tools { top: 8px; right: 8px; gap: 6px; }
     .film__ico { width: 34px; height: 34px; }
     .film__mid { width: 56px; height: 56px; margin: -28px 0 0 -28px; }
+    .film.is-loading .film__mid::before { width: 22px; height: 22px; }
+    .film.is-retry .film__lbl { display: inline; }
     .kit__tag { font-size: 12px; padding: 7px 10px; border-radius: 7px; }
     .idea__text { font-size: 17px; }
     .why__item { grid-template-columns: 40px minmax(0, 1fr); padding: 22px 0; }
@@ -654,7 +664,7 @@ gtag('config', 'G-8P7TF4SV17');
         <div class="film__screen">
           <video controls playsinline preload="none" poster="assets/livoltek/film-poster.jpg">
             <source src="assets/livoltek/film-1080.mp4" type="video/mp4" />
-            <track kind="subtitles" srclang="uk" label="Українська" src="assets/livoltek/film.uk.vtt" default />
+            <track kind="subtitles" srclang="uk" label="Українська" src="assets/livoltek/film.uk.vtt" />
           </video>
           <div class="film__sub" aria-hidden="true"></div>
           <button class="film__play" type="button" aria-label="Дивитися відео, 57 секунд">
@@ -905,7 +915,13 @@ if (film) {
   const fullBtn = film.querySelector('.film__full');
   const trackEl = fv.querySelector('track');
   const tr = trackEl && trackEl.track;
-  const play = () => { const p = fv.play(); if (p && p.catch) p.catch(() => {}); };
+  const play = () => {
+    const p = fv.play();
+    if (p && p.catch) p.catch(e => {
+      film.classList.remove('is-loading');
+      if (e && e.name === 'NotAllowedError') film.classList.add('is-paused');
+    });
+  };
   fv.controls = false;
   if (tr) {
     tr.mode = 'hidden';
@@ -933,21 +949,36 @@ if (film) {
   scr.addEventListener('keydown', () => { pointer = 'key'; wake(); });
   film.querySelector('.film__play').addEventListener('click', () => {
     if (!film.classList.contains('was-on') && window.matchMedia('(max-width: 720px)').matches) fv.src = 'assets/livoltek/film-720.mp4';
+    if (fv.error || film.classList.contains('is-retry')) fv.load();   // після збою — завантажити заново (збій <source> не пише video.error)
     if (fv.ended) fv.currentTime = 0;
+    film.classList.remove('is-retry');
     film.classList.add('is-on', 'was-on');
+    if (fv.readyState < 3) film.classList.add('is-loading');
     play();
     wake();
   });
   // на телефоні перший дотик показує кнопки, другий ставить на паузу
   hit.addEventListener('click', () => {
+    if (film.classList.contains('is-loading')) { wake(); return; }   // ще вантажиться — не ставимо на паузу
     if (pointer === 'touch' && film.classList.contains('is-idle')) { wake(); return; }
     if (fv.paused) play(); else fv.pause();
     wake();
   });
   fv.addEventListener('play', () => { film.classList.remove('is-paused'); hit.setAttribute('aria-label', 'Пауза'); });
   fv.addEventListener('pause', () => { film.classList.add('is-paused'); film.classList.remove('is-idle'); hit.setAttribute('aria-label', 'Продовжити'); });
+  fv.addEventListener('waiting', () => { if (!fv.paused) film.classList.add('is-loading'); });
+  fv.addEventListener('playing', () => film.classList.remove('is-loading'));
+  // збій завантаження — назад кнопка, з підписом «Спробувати ще раз» (наступне натискання вантажить заново)
+  const fail = () => {
+    film.classList.remove('is-on', 'is-paused', 'is-idle', 'is-loading');
+    film.classList.add('is-retry');
+    film.querySelector('.film__lbl').textContent = 'Спробувати ще раз';
+  };
+  fv.addEventListener('error', fail);
+  const srcEl = fv.querySelector('source');
+  if (srcEl) srcEl.addEventListener('error', fail);              // помилку <source> браузер шле на нього, не на <video>
   fv.addEventListener('ended', () => {
-    film.classList.remove('is-on', 'is-paused', 'is-idle');
+    film.classList.remove('is-on', 'is-paused', 'is-idle', 'is-loading');
     sub.classList.remove('is-on');
     film.querySelector('.film__lbl').textContent = 'Дивитися ще раз';
   });
@@ -984,6 +1015,10 @@ if (film) {
   document.addEventListener('fullscreenchange', onFs);
   document.addEventListener('webkitfullscreenchange', onFs);
   fv.addEventListener('webkitbeginfullscreen', () => { if (tr) tr.mode = 'showing'; });
+  // Safari сам вмикає доріжку (showing) після зміни src — тоді поверх наших титрів були б штатні, у плашці
+  const keepHidden = () => { if (tr && tr.mode === 'showing' && !fv.webkitDisplayingFullscreen) tr.mode = 'hidden'; };
+  ['loadedmetadata', 'play', 'playing'].forEach(n => fv.addEventListener(n, keepHidden));
+  if (fv.textTracks && fv.textTracks.addEventListener) fv.textTracks.addEventListener('change', keepHidden);
   fv.addEventListener('webkitendfullscreen', () => { if (tr) tr.mode = 'hidden'; });
 }
 </script>
