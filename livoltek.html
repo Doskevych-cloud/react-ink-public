@@ -218,7 +218,7 @@ gtag('config', 'G-8P7TF4SV17');
   .js .kit__img.is-static video { display: none; }
   /* підписи деталей — виноски з лініями; зʼявляються, коли система розібралась */
   .kit__lines { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .kit__lines line { stroke: rgba(255,255,255,.8); stroke-width: 1px; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 0; }
+  .kit__lines line { stroke: rgba(255,255,255,.8); stroke-width: 1px; vector-effect: non-scaling-stroke; }
   .kit__lines circle { fill: #fff; }
   .kit__tag {
     position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%);
@@ -226,10 +226,11 @@ gtag('config', 'G-8P7TF4SV17');
     background: rgba(35,38,45,.94); padding: 9px 13px; border-radius: 8px; pointer-events: none;
   }
   .js .kit__tag { opacity: 0; transition: opacity .45s var(--ease); }
-  .js .kit__lines line { stroke-dashoffset: 1; transition: stroke-dashoffset .5s var(--ease) .15s; }
+  /* лінії сховані до кінця відео, далі їх домальовує JS (stroke-dasharray з non-scaling-stroke видно одразу) */
+  .js .kit__lines { visibility: hidden; }
   .js .kit__lines circle { opacity: 0; transition: opacity .3s var(--ease) .55s; }
   .js .kit__img.is-done .kit__tag { opacity: 1; }
-  .js .kit__img.is-done .kit__lines line { stroke-dashoffset: 0; }
+  .js .kit__img.is-done .kit__lines { visibility: visible; }
   .js .kit__img.is-done .kit__lines circle { opacity: 1; }
   .kit__list { list-style: none; margin: 36px 0 0; padding: 0; }
   .kit__item { padding: 20px 0; border-top: 1px solid var(--line-2); }
@@ -474,9 +475,9 @@ gtag('config', 'G-8P7TF4SV17');
             <source src="assets/livoltek/kit-open.mp4" type="video/mp4" />
           </video>
           <svg class="kit__lines" viewBox="0 0 100 100" aria-hidden="true">
-            <line pathLength="1" x1="37.5" y1="10" x2="41.5" y2="25.5" /><circle cx="41.5" cy="25.5" r=".55" />
-            <line pathLength="1" x1="74.5" y1="10" x2="74.5" y2="20.5" /><circle cx="74.5" cy="20.5" r=".55" />
-            <line pathLength="1" x1="50" y1="91" x2="50" y2="82" /><circle cx="50" cy="82" r=".55" />
+            <line x1="37.5" y1="10" x2="41.5" y2="25.5" /><circle cx="41.5" cy="25.5" r=".55" />
+            <line x1="74.5" y1="10" x2="74.5" y2="20.5" /><circle cx="74.5" cy="20.5" r=".55" />
+            <line x1="50" y1="91" x2="50" y2="82" /><circle cx="50" cy="82" r=".55" />
           </svg>
           <span class="kit__tag" style="--x:37%;--y:7%">Інвертор</span>
           <span class="kit__tag" style="--x:75.5%;--y:7%">Декоративні панелі</span>
@@ -747,8 +748,23 @@ if (heroVideo && !window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 const kitAnim = document.getElementById('kitAnim');
 const kitVideo = document.getElementById('kitVideo');
 if (kitAnim && kitVideo) {
-  const done = () => kitAnim.classList.add('is-done');
-  const still = () => { kitAnim.classList.add('is-static'); done(); };
+  // виноски: до кінця відео лінії нульової довжини, потім кінець лінії їде від підпису до деталі
+  const kitLines = [...kitAnim.querySelectorAll('.kit__lines line')].map(l => {
+    const p = ['x1', 'y1', 'x2', 'y2'].map(a => +l.getAttribute(a));
+    l.setAttribute('x2', p[0]); l.setAttribute('y2', p[1]);
+    return [l, p];
+  });
+  const drawLines = instant => {
+    const t0 = performance.now() + (instant ? -1e4 : 150);
+    const step = now => {
+      const u = Math.min(Math.max((now - t0) / 500, 0), 1), e = 1 - Math.pow(1 - u, 3);
+      kitLines.forEach(([l, p]) => { l.setAttribute('x2', p[0] + (p[2] - p[0]) * e); l.setAttribute('y2', p[1] + (p[3] - p[1]) * e); });
+      if (u < 1) requestAnimationFrame(step);
+    };
+    step(performance.now());
+  };
+  const done = instant => { kitAnim.classList.add('is-done'); drawLines(instant === true); };
+  const still = () => { kitAnim.classList.add('is-static'); done(true); };
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
     still();
   } else {
