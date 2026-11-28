@@ -1069,6 +1069,7 @@ function renderCatalog() {
   // Колонка «Даташит»: сторінка товару на самому react.ink — «Огляд», у тій самій вкладці;
   // усе інше (PDF, файл на Google Drive тощо) — «PDF» у новій вкладці, як було.
   const dsLink = u => {
+    if (!/^(https?:\/\/|\/(?!\/))/i.test(u)) return '';   // лише http(s) або шлях сайту
     const page = /^(\/|https?:\/\/react\.ink\/)/i.test(u) && !/\.pdf([?#]|$)/i.test(u);
     return `<a class="ds-link" href="${esc(u)}"${page ? '' : ' target="_blank" rel="noopener"'}>${dsIcon}${page ? 'Огляд' : 'PDF'}</a>`;
   };
